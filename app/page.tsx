@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/config";
+import { HomeImage } from "./home-image";
 
 function Check() {
   return (
@@ -10,6 +11,96 @@ function Check() {
   );
 }
 
+function Tick() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" className="mt-1 shrink-0">
+      <path d="M3 8.4l3.2 3.2L13 4.8" stroke="var(--brass)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Cross() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" className="mt-1 shrink-0">
+      <path d="M4 4l8 8M12 4l-8 8" stroke="var(--dusk)" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const steps = [
+  {
+    n: "01",
+    title: "Write your terms",
+    body: "Say who you are and what you’re after in your own words: the kind of relationship, how much time you have, what matters to you. No guessing games, no decoding.",
+    image: "step-1.jpg",
+    alt: "A table set for two in a candlelit restaurant",
+  },
+  {
+    n: "02",
+    title: "Meet people who agree",
+    body: "Search by age, distance and what people are looking for, so the profiles you see already want something compatible. Like someone, or just say hello.",
+    image: "step-2.jpg",
+    alt: "Two people laughing over coffee",
+  },
+  {
+    n: "03",
+    title: "Take it at your pace",
+    body: "Talk in private, block anyone in two taps, and only meet when you’re ready. Nobody is hurrying you, and nothing sits behind a paywall to slow you down.",
+    image: "step-3.jpg",
+    alt: "A couple walking along a city street at dusk",
+  },
+];
+
+const features = [
+  {
+    title: "Honest profiles",
+    body: "A dedicated space to state what you’re looking for, shown on your profile and in search, so the right people find you.",
+  },
+  {
+    title: "Photos checked by a person",
+    body: "Every photo is reviewed by a human before anyone else can see it. Fake and stolen pictures don’t make it through.",
+  },
+  {
+    title: "Private by design",
+    body: "Your exact location is never shown, only a rounded distance. Photos are scrubbed of hidden metadata before they’re uploaded.",
+  },
+  {
+    title: "Live messaging",
+    body: "Messages arrive instantly, with sent and read receipts, so you’re never left wondering whether someone saw yours.",
+  },
+  {
+    title: "Real moderation",
+    body: "Report a profile or a conversation and a moderator reviews it. Suspected under-18s are looked at first, and repeat offenders are banned.",
+  },
+  {
+    title: "Your data, your call",
+    body: "Download everything we hold about you, or delete your account, whenever you like. No emails to chase.",
+  },
+];
+
+const faqs = [
+  {
+    q: `Is ${SITE_NAME} really free?`,
+    a: "Yes. Joining is free, and at launch there is no subscription between you and a conversation. If we ever add paid features, we’ll tell members first and the basics, like creating a profile and replying to messages, will stay free.",
+  },
+  {
+    q: "What kind of relationships is this for?",
+    a: "Whatever two consenting adults agree on, as long as they say so openly. Some members want a traditional partner, others want something more flexible. The point is that you state it up front.",
+  },
+  {
+    q: "How do you keep it safe?",
+    a: "Members must be 18 or over, every photo is reviewed by a person before it’s visible, and you can block or report anyone from any profile or chat. Reports go to real moderators.",
+  },
+  {
+    q: "Is anything off limits?",
+    a: "Yes. We don’t allow, and will remove, anything that offers or requests sexual services for payment. It’s a dating site, and accounts that break this rule are banned.",
+  },
+  {
+    q: "Who can see my profile?",
+    a: "Only signed-in members who match your preferences. Your exact location is never shown, and you can block anyone, which hides you from each other completely.",
+  },
+];
+
 export default function Home() {
   return (
     <>
@@ -18,6 +109,12 @@ export default function Home() {
           {SITE_NAME}
         </Link>
         <nav className="flex items-center gap-2 sm:gap-3">
+          <a href="#how" className="hidden px-3 text-sm text-dusk hover:text-pearl sm:block">
+            How it works
+          </a>
+          <a href="#why" className="hidden px-3 text-sm text-dusk hover:text-pearl sm:block">
+            Why {SITE_NAME}
+          </a>
           <Link href="/login" className="btn btn-quiet !py-2 text-sm">
             Sign in
           </Link>
@@ -28,35 +125,46 @@ export default function Home() {
       </header>
 
       <main>
+        {/* Hero */}
         <section className="mx-auto grid w-full max-w-6xl gap-14 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:pt-20">
           <div>
+            <p className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-brass">
+              Dating, on clear terms
+            </p>
             <h1 className="display text-[clamp(2.9rem,8vw,6.2rem)]">
               Say what you’re looking for.
             </h1>
-            <p className="serif-body mt-7 max-w-[34ch] text-xl text-dusk sm:text-2xl">
-              Meet adults who’d rather be direct about the kind of relationship they want.
+            <p className="serif-body mt-7 max-w-[36ch] text-xl text-dusk sm:text-2xl">
+              Meet adults who’d rather be direct about the relationship they want, without paying
+              a fortune just to send a message.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link href="/signup" className="btn btn-primary">
-                Create your profile
+                Create your free profile
               </Link>
-              <Link href="/login" className="btn btn-quiet">
-                I have an account
-              </Link>
+              <a href="#how" className="btn btn-quiet">
+                See how it works
+              </a>
             </div>
-            <p className="mt-5 text-sm text-dusk">Free to join. 18 and over only.</p>
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-dusk">
+              <li className="flex items-center gap-2"><Check /> Free to join</li>
+              <li className="flex items-center gap-2"><Check /> No paywall on messaging</li>
+              <li className="flex items-center gap-2"><Check /> Every photo reviewed</li>
+            </ul>
+            <p className="mt-5 text-sm text-dusk">18 and over only.</p>
           </div>
 
           {/* A sample profile: shows the product's one idea, a profile that states its terms. */}
           <div className="rise mx-auto w-full max-w-sm lg:mx-0 lg:justify-self-end" aria-label="Example profile">
-            <div className="overflow-hidden rounded-[22px] border border-line bg-velvet">
-              <div
-                className="relative aspect-[4/4.2]"
-                style={{
-                  background:
-                    "radial-gradient(120% 90% at 30% 20%, #6b2c45 0%, #3b1c33 45%, #1b1220 100%)",
-                }}
-              >
+            <div className="overflow-hidden rounded-[22px] border border-line bg-velvet shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
+              <div className="relative">
+                <HomeImage
+                  name="hero.jpg"
+                  alt="Smiling woman at a window table in a restaurant"
+                  sizes="(min-width: 1024px) 384px, 90vw"
+                  priority
+                  className="aspect-[4/4.2]"
+                />
                 <div
                   className="absolute inset-0"
                   style={{
@@ -68,8 +176,11 @@ export default function Home() {
                   <p className="display flex items-center gap-2 text-3xl">
                     Elena, 29 <Check />
                   </p>
-                  <p className="text-sm text-dusk">London · Verified</p>
+                  <p className="text-sm text-dusk">London</p>
                 </div>
+                <span className="absolute left-4 top-4 rounded-full bg-night/70 px-3 py-1 text-xs text-dusk backdrop-blur">
+                  Example profile
+                </span>
               </div>
               <div className="space-y-4 p-5">
                 <p className="serif-body italic text-pearl/90">
@@ -88,28 +199,132 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Why: the price story, said gently */}
+        <section id="why" className="border-t border-line bg-velvet/50">
+          <div className="mx-auto grid w-full max-w-6xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:gap-20">
+            <div>
+              <h2 className="display text-[clamp(2rem,5vw,3.4rem)]">
+                Honest dating shouldn’t come with a monthly bill.
+              </h2>
+              <p className="serif-body mt-6 text-lg text-dusk">
+                Most sites in this space make money by keeping you locked out: pay to read your
+                messages, pay to reply, pay to be seen. The people who most want to be direct end
+                up paying the most to find someone who is.
+              </p>
+              <p className="serif-body mt-4 text-lg text-dusk">
+                {SITE_NAME} was built the other way round. Clear profiles, real people and
+                private conversation, with the basics free at launch, so the only thing between you
+                and a good conversation is saying hello.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[18px] border border-line p-6">
+                <p className="text-sm font-semibold uppercase tracking-wide text-dusk">The usual way</p>
+                <ul className="mt-4 space-y-3 text-dusk">
+                  <li className="flex gap-3"><Cross /> Pay to read or answer a message</li>
+                  <li className="flex gap-3"><Cross /> Vague profiles and mixed signals</li>
+                  <li className="flex gap-3"><Cross /> Fake photos and spam accounts</li>
+                  <li className="flex gap-3"><Cross /> A subscription you have to remember to cancel</li>
+                </ul>
+              </div>
+              <div className="rounded-[18px] border border-brass/50 bg-velvet p-6">
+                <p className="text-sm font-semibold uppercase tracking-wide text-brass">{SITE_NAME}</p>
+                <ul className="mt-4 space-y-3">
+                  <li className="flex gap-3"><Tick /> Free to join and start conversations</li>
+                  <li className="flex gap-3"><Tick /> Profiles that state what you want</li>
+                  <li className="flex gap-3"><Tick /> Every photo reviewed by a person</li>
+                  <li className="flex gap-3"><Tick /> No card needed, nothing to cancel</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section id="how" className="border-t border-line">
+          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+            <h2 className="display max-w-[18ch] text-[clamp(2rem,5vw,3.4rem)]">
+              Three steps from hello to something real.
+            </h2>
+            <div className="mt-14 grid gap-10 md:grid-cols-3">
+              {steps.map((s) => (
+                <article key={s.n}>
+                  <HomeImage
+                    name={s.image}
+                    alt={s.alt}
+                    sizes="(min-width: 768px) 360px, 90vw"
+                    tone={Number(s.n)}
+                    className="aspect-[4/3] rounded-[18px] border border-line"
+                  />
+                  <p className="mt-6 text-sm font-semibold text-brass">{s.n}</p>
+                  <h3 className="display mt-1 text-2xl">{s.title}</h3>
+                  <p className="mt-3 max-w-[40ch] text-dusk">{s.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section className="border-t border-line bg-velvet/50">
+          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+            <h2 className="display max-w-[20ch] text-[clamp(2rem,5vw,3.4rem)]">
+              Built for people who value their time and their privacy.
+            </h2>
+            <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+              {features.map((f) => (
+                <div key={f.title} className="border-t border-line pt-6">
+                  <h3 className="display text-2xl">{f.title}</h3>
+                  <p className="mt-3 max-w-[38ch] text-dusk">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
         <section className="border-t border-line">
-          <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-20 sm:px-8 md:grid-cols-3">
-            <div>
-              <h2 className="display text-3xl">Verified before visible</h2>
-              <p className="mt-3 max-w-[38ch] text-dusk">
-                Every member confirms their age and identity before their profile goes live, and
-                photos are reviewed by a person.
-              </p>
+          <div className="mx-auto w-full max-w-3xl px-5 py-20 sm:px-8">
+            <h2 className="display text-[clamp(2rem,5vw,3.2rem)]">Questions, answered plainly.</h2>
+            <div className="mt-10 divide-y divide-line border-y border-line">
+              {faqs.map((f) => (
+                <details key={f.q} className="group py-5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+                    {f.q}
+                    <span aria-hidden="true" className="text-2xl text-brass transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="mt-3 max-w-[60ch] text-dusk">{f.a}</p>
+                </details>
+              ))}
             </div>
-            <div>
-              <h2 className="display text-3xl">Clear from the first message</h2>
-              <p className="mt-3 max-w-[38ch] text-dusk">
-                Profiles have a space to say what you want in your own words, so the
-                conversation starts with honesty instead of guesswork.
-              </p>
-            </div>
-            <div>
-              <h2 className="display text-3xl">You stay in control</h2>
-              <p className="mt-3 max-w-[38ch] text-dusk">
-                Block or report anyone in two taps. Scams and fake profiles are removed, and
-                repeat offenders are banned.
-              </p>
+          </div>
+        </section>
+
+        {/* Closing call to action */}
+        <section className="border-t border-line">
+          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+            <div className="relative isolate overflow-hidden rounded-[26px] border border-line">
+              <HomeImage
+                name="cta.jpg"
+                alt=""
+                sizes="(min-width: 1152px) 1100px, 100vw"
+                tone={2}
+                className="absolute inset-0 -z-10"
+              />
+              <div className="absolute inset-0 -z-10 bg-night/70" />
+              <div className="px-6 py-16 text-center sm:px-12 sm:py-24">
+                <h2 className="display mx-auto max-w-[18ch] text-[clamp(2.2rem,6vw,4rem)]">
+                  Your next conversation is one honest sentence away.
+                </h2>
+                <p className="serif-body mx-auto mt-5 max-w-[44ch] text-lg text-pearl/80">
+                  Set up your profile in a few minutes. It’s free, and you decide who sees it.
+                </p>
+                <Link href="/signup" className="btn btn-primary mt-9">
+                  Create your free profile
+                </Link>
+                <p className="mt-4 text-sm text-pearl/70">18 and over only.</p>
+              </div>
             </div>
           </div>
         </section>
