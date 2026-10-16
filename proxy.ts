@@ -7,6 +7,14 @@ const PROTECTED = ["/onboarding", "/discover", "/photos", "/profile", "/interest
 const AUTH_PAGES = ["/login", "/signup"];
 
 export default async function proxy(request: NextRequest) {
+  // Supabase sends the email link to the site root with ?code= when it rejects the requested redirect.
+  // Hand the code to the callback so the link still works.
+  if (request.nextUrl.pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

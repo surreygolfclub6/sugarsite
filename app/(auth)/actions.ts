@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
@@ -93,6 +94,9 @@ export async function requestPasswordReset(_: AuthState, formData: FormData): Pr
   if (error?.code === "over_email_send_rate_limit" || error?.status === 429) {
     return { error: "Too many requests. Please wait a few minutes and try again." };
   }
+  // If Supabase ignores redirectTo and sends the link to the site root, the callback uses this to tell a
+  // reset link from a sign-up link. The PKCE code only works in this browser anyway, so the cookie does too.
+  (await cookies()).set("pw_reset", "1", { maxAge: 3600, path: "/", httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
   return { notice: "If there’s an account for that email, we’ve sent a link to reset the password. It can take a few minutes." };
 }
 
