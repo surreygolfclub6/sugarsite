@@ -149,7 +149,7 @@ test("results sit two to a row, fill the width, have no logo header, and more lo
   // The tiles use nearly the whole screen width and there's no brand header above the title.
   expect(a.x).toBeLessThan(14);
   expect(b.x + b.width).toBeGreaterThan(412 - 14);
-  await expect(page.getByRole("link", { name: "Ardor" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "SugarMatch" })).toHaveCount(0);
   expect((await page.getByRole("heading", { name: "Search", exact: true }).boundingBox())!.y).toBeLessThan(40);
 
   // Scrolling brings in the rest.

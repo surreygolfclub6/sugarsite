@@ -1,5 +1,5 @@
 // One place to rename the product and tune launch rules.
-export const SITE_NAME = "Ardor";
+export const SITE_NAME = "SugarMatch";
 export const SITE_TAGLINE = "Relationships on clear terms";
 export const MIN_AGE = 18;
 

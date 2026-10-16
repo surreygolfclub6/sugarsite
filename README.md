@@ -1,7 +1,7 @@
-# Ardor
+# SugarMatch
 
 Dating site built with Next.js 16 (App Router), Supabase (Postgres, Auth, Realtime, Storage) and Tailwind 4.
-"Ardor" is a placeholder name. Change it in `lib/config.ts`.
+"SugarMatch" is the working name (domain: sugarmatch.site). Change it in `lib/config.ts`.
 
 ## Setup
 

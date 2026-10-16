@@ -54,7 +54,7 @@ test("signing up needs both the age and terms tick and a separate consent for se
   await expect(page.getByText("Please agree to how we use the sensitive details you add to your profile.")).toBeVisible();
 
   // The consent wording names what it covers and links to the policy.
-  const consent = page.getByLabel(/I agree that Ardor may use the sensitive details/);
+  const consent = page.getByLabel(/I agree that SugarMatch may use the sensitive details/);
   await expect(consent).not.toBeChecked();
   await expect(page.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/privacy");
   await expect(page.getByText("who I’m looking for, my relationship goals and my ethnicity")).toBeVisible();
