@@ -33,21 +33,21 @@ const steps = [
     title: "Write your terms",
     body: "Say who you are and what you’re after in your own words: the kind of relationship, how much time you have, what matters to you. No guessing games, no decoding.",
     image: "step-1.jpg",
-    alt: "A table set for two in a candlelit restaurant",
+    alt: "A restaurant table set for two, with a glowing lamp and an orchid",
   },
   {
     n: "02",
     title: "Meet people who agree",
     body: "Search by age, distance and what people are looking for, so the profiles you see already want something compatible. Like someone, or just say hello.",
     image: "step-2.jpg",
-    alt: "Two people laughing over coffee",
+    alt: "A couple laughing together on a wooden bench",
   },
   {
     n: "03",
     title: "Take it at your pace",
     body: "Talk in private, block anyone in two taps, and only meet when you’re ready. Nobody is hurrying you, and nothing sits behind a paywall to slow you down.",
     image: "step-3.jpg",
-    alt: "A couple walking along a city street at dusk",
+    alt: "Two people holding hands as they walk through an underpass at night",
   },
 ];
 
@@ -160,7 +160,7 @@ export default function Home() {
               <div className="relative">
                 <HomeImage
                   name="hero.jpg"
-                  alt="Smiling woman at a window table in a restaurant"
+                  alt="A woman seated at a restaurant table as her date arrives"
                   sizes="(min-width: 1024px) 384px, 90vw"
                   priority
                   className="aspect-[4/4.2]"
@@ -341,12 +341,21 @@ export default function Home() {
             <a href="https://www.geonames.org" className="underline hover:text-pearl">GeoNames</a>, licensed under{" "}
             <a href="https://creativecommons.org/licenses/by/4.0/" className="underline hover:text-pearl">CC BY 4.0</a>.
           </p>
-          <nav className="flex gap-5">
+          <nav className="flex gap-5 md:shrink-0">
             <Link href="/terms" className="hover:text-pearl">Terms</Link>
             <Link href="/privacy" className="hover:text-pearl">Privacy</Link>
             <Link href="/safety" className="hover:text-pearl">Safety</Link>
           </nav>
         </div>
+        <p className="mx-auto w-full max-w-6xl px-5 pb-10 text-xs text-dusk sm:px-8">
+          Photos, cropped: “Couple enjoys a meal at a restaurant” and “A young couple sits closely on a wooden bench” by{" "}
+          <a href="https://commons.wikimedia.org/wiki/File:Couple_enjoys_a_meal_at_a_restaurant_with_attentive_interaction.jpg" className="underline hover:text-pearl">Shixart1985</a>
+          {" "}(<a href="https://creativecommons.org/licenses/by/2.0/" className="underline hover:text-pearl">CC BY 2.0</a>); “Walking together, Boulevard de Nantes subway, Cardiff” by{" "}
+          <a href="https://commons.wikimedia.org/wiki/File:Walking_together_Boulevard_de_Nantes_subway,_Cardiff_(46626750612).jpg" className="underline hover:text-pearl">Jeremy Segrott</a>
+          {" "}(<a href="https://creativecommons.org/licenses/by/2.0/" className="underline hover:text-pearl">CC BY 2.0</a>); “Cozy candlelit dinner for two” by{" "}
+          <a href="https://commons.wikimedia.org/wiki/File:DZ6_2628_Cozy_candlelit_dinner_for_two_elegant_Thai_restaurant_setting_with_twinkling_lights_and_a_delicate_orchid_centerpiece.jpg" className="underline hover:text-pearl">PattayaPatrol</a>
+          {" "}(<a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline hover:text-pearl">CC BY-SA 4.0</a>), via Wikimedia Commons. The people shown are not {SITE_NAME} members.
+        </p>
       </footer>
     </>
   );
