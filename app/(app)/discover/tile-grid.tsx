@@ -85,7 +85,7 @@ export function TileGrid({
                 <p className="flex items-center gap-1.5 font-medium">
                   {c.online && <span role="img" aria-label="Online now" className="size-2.5 shrink-0 rounded-full bg-emerald-500" />}
                   <span className="truncate">{c.display_name}</span>
-                  {c.age_verified && <AgeBadge className="size-3.5" />}
+                  {c.age_verified && <AgeBadge className="size-[18px]" />}
                 </p>
                 <p className="truncate text-xs text-pearl/80">
                   {c.age} · {c.city}
