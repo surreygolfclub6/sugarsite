@@ -55,8 +55,7 @@ export default function TermsPage() {
           match, which is when you and another member have both liked each other.
         </li>
         <li>
-          Your level rises as you add a photo, complete your profile, have conversations (chats where you have both written)
-          and invite friends who become real members, and it can fall if those things stop being true. An upheld report about you holds your level at Member for
+          Your level rises as you invite friends who become real members, add a photo, complete your profile and have conversations (chats where you have both written, or matches), and it can fall if those things stop being true. An upheld report about you holds your level at Member for
           90 days. See <Link href="/levels">How levels work</Link>.
         </li>
         <li>

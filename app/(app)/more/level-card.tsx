@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/config";
 import { CopyLink } from "@/components/copy-link";
 import { LevelBadge } from "@/components/level-badge";
-import type { Progress } from "@/lib/levels";
+import { isUnlimited, perDayText, type Progress } from "@/lib/levels";
 
 function Step({
   done,
@@ -81,7 +81,9 @@ export async function LevelCard({ userId }: { userId: string }) {
             <span className="flex flex-wrap items-baseline gap-x-2">
               <h2 className="display text-xl">{pr.label}</h2>
               <span className="text-xs text-dusk">
-                {used} of {pr.daily_conversations} new conversations today
+                {isUnlimited(pr.daily_conversations)
+                  ? "Unlimited new conversations"
+                  : `${used} of ${pr.daily_conversations} new conversations today`}
               </span>
             </span>
           </span>
@@ -92,10 +94,10 @@ export async function LevelCard({ userId }: { userId: string }) {
             <div className="flex items-baseline justify-between text-sm">
               <span>New conversations today</span>
               <span className="text-dusk">
-                {used} of {pr.daily_conversations}
+                {isUnlimited(pr.daily_conversations) ? `${pr.started_today} started, no limit` : `${used} of ${pr.daily_conversations}`}
               </span>
             </div>
-            <div
+            {!isUnlimited(pr.daily_conversations) && <div
               className="mt-2 h-2 overflow-hidden rounded-full bg-line"
               role="progressbar"
               aria-valuemin={0}
@@ -107,7 +109,7 @@ export async function LevelCard({ userId }: { userId: string }) {
                 className="h-full rounded-full bg-garnet"
                 style={{ width: `${(used / pr.daily_conversations) * 100}%` }}
               />
-            </div>
+            </div>}
             <p className="mt-2 text-xs text-dusk">
               Replying to people who message you, and messaging a match, never
               uses these up.
@@ -131,10 +133,19 @@ export async function LevelCard({ userId }: { userId: string }) {
             <div className="mt-6 border-t border-line pt-5">
               <p className="text-sm font-semibold">Next: {next.label}</p>
               <p className="mt-1 text-xs text-dusk">
-                You’d get {next.daily_conversations} new conversations a day and
+                You’d get {perDayText(next.daily_conversations).toLowerCase()} and
                 a {next.label} badge.
               </p>
               <ul className="mt-4 space-y-3">
+                {next.min_referrals > 0 && (
+                  <Step done={m.referrals_qualified >= next.min_referrals}>
+                    Invite {next.min_referrals}{" "}
+                    {next.min_referrals === 1 ? "friend" : "friends"} who become
+                    real members (
+                    {Math.min(m.referrals_qualified, next.min_referrals)} so
+                    far)
+                  </Step>
+                )}
                 {next.needs_photo && (
                   <Step done={m.has_photo}>
                     Get a photo approved, public or private (
@@ -161,8 +172,7 @@ export async function LevelCard({ userId }: { userId: string }) {
                 )}
                 {next.min_conversations > 0 && (
                   <Step done={m.conversations >= next.min_conversations}>
-                    Have {next.min_conversations} conversations, where you’ve
-                    both written (
+                    Have {next.min_conversations} conversations or matches (
                     {Math.min(m.conversations, next.min_conversations)} so far)
                   </Step>
                 )}
@@ -170,15 +180,6 @@ export async function LevelCard({ userId }: { userId: string }) {
                   <Step done={m.responsive}>
                     Keep a good response record: answer at least half of the
                     people who write to you first
-                  </Step>
-                )}
-                {next.min_referrals > 0 && (
-                  <Step done={m.referrals_qualified >= next.min_referrals}>
-                    Invite {next.min_referrals}{" "}
-                    {next.min_referrals === 1 ? "friend" : "friends"} who become
-                    real members (
-                    {Math.min(m.referrals_qualified, next.min_referrals)} so
-                    far)
                   </Step>
                 )}
               </ul>

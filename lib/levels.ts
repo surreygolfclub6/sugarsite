@@ -16,6 +16,11 @@ export type Level = {
   how: string;
 };
 
+// A level with this many new conversations a day or more has no limit (Champion).
+export const UNLIMITED_FROM = 100;
+export const isUnlimited = (perDay: number) => perDay >= UNLIMITED_FROM;
+export const perDayText = (perDay: number) => (isUnlimited(perDay) ? "Unlimited new conversations" : `${perDay} new conversations a day`);
+
 export const LEVELS: Level[] = [
   {
     tier: "newcomer",
@@ -33,40 +38,40 @@ export const LEVELS: Level[] = [
     label: "Member",
     tagline: "A real profile and real conversations.",
     conversationsPerDay: 5,
-    minConversations: 3,
-    minFriends: 0,
+    minConversations: 2,
+    minFriends: 1,
     needsPhotoAndProfile: true,
     needsResponseRecord: false,
-    how: "An approved photo (public or private), a complete profile, and 3 conversations.",
+    how: "An approved photo (public or private), a complete profile, 2 conversations or matches, and 1 invited friend who has become a real member.",
   },
   {
     tier: "trusted",
     label: "Trusted",
     tagline: "People who make the community better.",
     conversationsPerDay: 12,
-    minConversations: 10,
-    minFriends: 1,
+    minConversations: 5,
+    minFriends: 3,
     needsPhotoAndProfile: true,
     needsResponseRecord: true,
-    how: "Everything in Member, 10 conversations, 1 invited friend who has become a real member, and a good response record.",
+    how: "Everything in Member, 5 conversations or matches, 3 invited friends who have become real members, and a good response record.",
   },
   {
     tier: "champion",
     label: "Champion",
     tagline: "The people who keep SugarMatch thriving.",
-    conversationsPerDay: 25,
-    minConversations: 25,
-    minFriends: 3,
+    conversationsPerDay: 500,
+    minConversations: 10,
+    minFriends: 10,
     needsPhotoAndProfile: true,
     needsResponseRecord: true,
-    how: "Everything in Trusted, 25 conversations, and 3 invited friends who have become real members.",
+    how: "Everything in Trusted, 10 conversations or matches, and 10 invited friends who have become real members. Champions have no daily limit.",
   },
 ];
 
 // What every level gets, in plain words. The same lines appear wherever levels are explained.
 export function whatYouGet(level: Level): string[] {
   return [
-    `${level.conversationsPerDay} new conversations a day`,
+    perDayText(level.conversationsPerDay),
     "Replying and messaging a match: always unlimited",
     `A ${level.label} badge on your profile`,
   ];
@@ -106,8 +111,8 @@ export type Progress = {
 export const DEFINITIONS = {
   photo: "any photo a person on our team has approved. It can be public or private, so you’re never held back for keeping your photos to yourself",
   completeProfile: "a headline, an “about you” of at least 40 characters, “what I’m looking for” of at least 20, your location and at least one relationship goal",
-  conversation: "a chat where you and the other person have both written in the last 60 days. It counts once per person, and it doesn’t matter who started it",
+  conversation: "a chat where you and the other person have both written in the last 60 days, or a match. It counts once per person, and it doesn’t matter who started it",
   responseRecord: "if people write to you first, you answer at least half of them. This only matters once three people have written to you, so you’re never marked down for messages you didn’t get",
   match: "two members who have both liked each other. Messaging a match never uses up your daily new conversations",
-  realMember: "someone you invited with your link who has passed the age check, been approved, added a photo, completed their profile and stayed live for 7 days",
+  realMember: "someone you invited with your link who has passed the age check, been approved, added a photo, completed their profile and stayed live for 3 days",
 };

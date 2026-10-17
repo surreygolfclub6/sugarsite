@@ -10,16 +10,16 @@ export const metadata: Metadata = {
 };
 
 const steps = [
+  { title: "Invite friends who’d like to be here", body: `Friends are what move you up. Every member has a personal invite link. A friend counts once they’re a real member: ${DEFINITIONS.realMember}. You see how many, never who. It takes 1 friend to reach Member, 3 for Trusted and 10 for Champion.` },
   { title: "Add a photo", body: "Upload a clear photo of you. Once a person on our team has approved it, it counts, whether it’s public or private." },
   { title: "Complete your profile", body: `A complete profile has ${DEFINITIONS.completeProfile}.` },
-  { title: "Start and keep conversations going", body: `A conversation is ${DEFINITIONS.conversation}. You don’t need to wait for messages: start conversations yourself and they count once the other person writes back.` },
-  { title: "Invite friends who’d like to be here", body: `A friend counts once they’re a real member: ${DEFINITIONS.realMember}. You see how many, never who.` },
+  { title: "Start conversations and match", body: `A conversation is ${DEFINITIONS.conversation}. You don’t need to wait for messages: start conversations yourself and they count once the other person writes back, and every match counts too.` },
 ];
 
 const faqs = [
   { q: "Is replying ever limited?", a: "No. Replying to someone who has messaged you is always unlimited, at every level. So is messaging a match. The limit only applies to starting brand-new conversations with people you haven’t matched with." },
   { q: "What’s a match?", a: `A match is ${DEFINITIONS.match}. Liking someone is a low-pressure way to say hello: if they like you back, you both see it, you can message each other freely, and the conversation doesn’t use up your daily limit.` },
-  { q: "What if nobody messages me?", a: "You don’t need to receive messages to move up. Conversations count whoever starts them, as soon as both of you have written. Start a few each day (you get more in your first week), like people you’d like to meet, and invite a friend." },
+  { q: "What if nobody messages me?", a: "You don’t need to receive messages to move up. Conversations count whoever starts them, as soon as both of you have written. Start a few each day (you get more in your first week) and like people you’d like to meet, because a match counts too. Inviting friends is what lifts your level: 1 friend for Member, 3 for Trusted, 10 for Champion, who have no daily limit." },
   { q: "What’s the response record?", a: `It only applies to Trusted and Champion. ${DEFINITIONS.responseRecord.charAt(0).toUpperCase() + DEFINITIONS.responseRecord.slice(1)}.` },
   { q: "Why are the limits lower when you start?", a: "It keeps conversations genuine. Members who add a photo, fill in their profile and have real conversations make the community better for everyone, so they get more room." },
   { q: "Do I have to show a photo publicly?", a: "No. A private photo counts towards your level just like a public one. Private photos aren’t shown on your profile or in search; you choose which members can see them. Our team still reviews every photo before it’s approved." },

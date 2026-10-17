@@ -2,7 +2,7 @@ import Link from "next/link";
 import { COMPANY, SITE_NAME } from "@/lib/config";
 import { AgeBadge } from "@/components/age-badge";
 import { LevelBadge } from "@/components/level-badge";
-import { LEVELS, whatYouGet } from "@/lib/levels";
+import { LEVELS, isUnlimited, whatYouGet } from "@/lib/levels";
 import { ProfileCarousel } from "@/components/profile-carousel";
 import { HomeImage } from "./home-image";
 import { FinalCta, HeaderActions, HeroActions } from "./home-session";
@@ -368,8 +368,8 @@ export default function Home() {
               <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-brass">Levels</p>
               <h2 className="display text-[clamp(2rem,5vw,3.4rem)]">The more you give, the more you get.</h2>
               <p className="serif-body mt-6 text-lg text-dusk">
-                {SITE_NAME} is free, and you earn more room by being a genuine member: a real photo, a complete profile,
-                real conversations, and friends who join and stay. No payments, no gimmicks.
+                {SITE_NAME} is free, and you earn more room by being a genuine member: friends who join and stay, a real photo, a
+                complete profile and real conversations. No payments, no gimmicks.
               </p>
             </div>
 
@@ -385,8 +385,12 @@ export default function Home() {
                   <div className="mt-5 border-t border-line pt-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-dusk">What you get</p>
                     <p className="mt-2">
-                      <span className="display text-4xl">{l.conversationsPerDay}</span>
-                      <span className="ml-2 text-sm text-dusk">new conversations a day</span>
+                      {isUnlimited(l.conversationsPerDay) ? (
+                        <span className="display text-4xl">Unlimited</span>
+                      ) : (
+                        <span className="display text-4xl">{l.conversationsPerDay}</span>
+                      )}
+                      <span className="ml-2 text-sm text-dusk">new conversations{isUnlimited(l.conversationsPerDay) ? "" : " a day"}</span>
                     </p>
                     <p className="mt-1 text-sm text-dusk">{whatYouGet(l)[1]}, and a {l.label} badge.</p>
                   </div>
@@ -401,7 +405,7 @@ export default function Home() {
             <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-[60ch] text-dusk">
                 Replying to someone who messages you is always unlimited, and so is messaging a match: two members who like
-                each other. Every member also gets a personal invite link, and when friends join and become real members, you move up.
+                each other. Every member also gets a personal invite link. Friends who join and become real members are what move you up: 1 for Member, 3 for Trusted and 10 for Champion, who have no daily limit.
               </p>
               <Link href="/levels" className="btn btn-quiet shrink-0">See how levels work</Link>
             </div>

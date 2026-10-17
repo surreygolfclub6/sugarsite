@@ -8,7 +8,10 @@ export const MIN_AGE = 18;
 export const FREE_NEW_CONVERSATIONS_PER_DAY = 5;
 
 // Where emails and redirects point. Set NEXT_PUBLIC_SITE_URL in each environment.
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// Production falls back to the real domain so a missing variable never sends emails or redirects to localhost.
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.NODE_ENV === "production" ? "https://sugarmatch.site" : "http://localhost:3000");
 
 // Legal pages. Fill in the placeholders and set LEGAL_DRAFT to false once a solicitor has reviewed the text.
 export const LEGAL_DRAFT = true;

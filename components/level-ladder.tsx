@@ -23,17 +23,15 @@ function Requirements({ level, progress }: { level: Level; progress?: Progress }
   const m = progress?.metrics;
   return (
     <ul className="space-y-2">
+      <Line done={m ? m.referrals_qualified >= level.minFriends : undefined}>
+        {level.minFriends} invited {level.minFriends === 1 ? "friend" : "friends"} who {level.minFriends === 1 ? "has" : "have"} become {level.minFriends === 1 ? "a real member" : "real members"}
+        {m ? ` (${Math.min(m.referrals_qualified, level.minFriends)} so far)` : ""}
+      </Line>
       <Line done={m?.has_photo}>An approved photo (public or private)</Line>
       <Line done={m?.profile_ok}>A complete profile</Line>
       <Line done={m ? m.conversations >= level.minConversations : undefined}>
-        {level.minConversations} conversations{m ? ` (${Math.min(m.conversations, level.minConversations)} so far)` : ""}
+        {level.minConversations} conversations or matches{m ? ` (${Math.min(m.conversations, level.minConversations)} so far)` : ""}
       </Line>
-      {level.minFriends > 0 && (
-        <Line done={m ? m.referrals_qualified >= level.minFriends : undefined}>
-          {level.minFriends} invited {level.minFriends === 1 ? "friend" : "friends"} who {level.minFriends === 1 ? "has" : "have"} become real {level.minFriends === 1 ? "a member" : "members"}
-          {m ? ` (${Math.min(m.referrals_qualified, level.minFriends)} so far)` : ""}
-        </Line>
-      )}
       {level.needsResponseRecord && <Line done={m?.responsive}>A good response record</Line>}
     </ul>
   );

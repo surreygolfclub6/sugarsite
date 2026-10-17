@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { setupPath } from "@/lib/member-status";
-import type { Progress } from "@/lib/levels";
+import { perDayText, type Progress } from "@/lib/levels";
 import { LevelBadge } from "@/components/level-badge";
 import { LevelDefinitions, LevelLadder } from "@/components/level-ladder";
 
@@ -35,7 +35,7 @@ async function Levels() {
       </div>
       <p className="mt-3 px-1 text-dusk">
         <span className="mr-2 inline-block align-middle"><LevelBadge tier={progress.tier} className="size-5" /></span>
-        You’re a <strong className="text-pearl">{progress.label}</strong> with {progress.daily_conversations} new conversations a day.
+        You’re a <strong className="text-pearl">{progress.label}</strong> with {perDayText(progress.daily_conversations).toLowerCase()}.
         Replying and messaging a match are always unlimited.
       </p>
 

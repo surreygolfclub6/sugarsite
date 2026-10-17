@@ -55,9 +55,9 @@ match (two members who liked each other); a conversation with a match doesn't co
 per-level limit on likes; a flat anti-bot limit (150 an hour) sits in the likes trigger and isn't shown to members.
 
 Level inputs: an approved photo, a complete profile, conversations (a chat where both people have written in the last 60 days,
-whoever started it, so members who receive no messages can still progress), a response record for Trusted and Champion (answer at
-least half of the people who write first, judged only once three have), and invited friends who have become real members (live 7
-days, age checked, photo, complete profile). The first 7 days after going live count as Member; an upheld report in the last 90
+whoever started it, plus matches, so members who receive no messages can still progress), a response record for Trusted and Champion (answer at
+least half of the people who write first, judged only once three have), and invited friends who have become real members (live 3
+days, age checked, photo, complete profile). Invited friends are the backbone: Member needs 1, Trusted 3, Champion 10 (Champion has no daily limit, `daily_conversations` >= 100). The first 7 days after going live count as Member; an upheld report in the last 90
 days caps a member at Member. An `unlimited_messaging` row in `entitlements` lifts the daily limit (the paywall flag no longer does).
 
 Every member has a private invite code (`profiles.referral_code`, not readable through the API; the app reads your own on the
