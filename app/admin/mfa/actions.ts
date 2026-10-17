@@ -42,7 +42,8 @@ export async function startEnrollment(): Promise<Enrollment> {
   const { data, error } = await supabase.auth.mfa.enroll({
     factorType: "totp",
     issuer: "SugarMatch",
-    friendlyName: `Authenticator ${new Date().toISOString().slice(0, 16).replace("T", " ")}`,
+    // Names have to be unique per account, so two devices added in the same minute don't collide.
+    friendlyName: `Authenticator ${new Date().toISOString().slice(0, 16).replace("T", " ")} ${crypto.randomUUID().slice(0, 4)}`,
   });
   if (error || !data) return { error: "We couldn’t start the set-up. Please try again." };
   await record(user.id, "admin_mfa_enrol_started");
