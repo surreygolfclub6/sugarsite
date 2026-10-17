@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE_NAME } from "@/lib/config";
+import { COMPANY, SITE_NAME } from "@/lib/config";
 import { AgeBadge } from "@/components/age-badge";
 import { ProfileCarousel } from "@/components/profile-carousel";
 import { HomeImage } from "./home-image";
@@ -458,6 +458,7 @@ export default function Home() {
             <Link href="/terms" className="hover:text-pearl">Terms</Link>
             <Link href="/privacy" className="hover:text-pearl">Privacy</Link>
             <Link href="/safety" className="hover:text-pearl">Safety</Link>
+            <a href={`mailto:${COMPANY.email}`} className="hover:text-pearl">Contact</a>
           </nav>
         </div>
         <p className="mx-auto w-full max-w-7xl px-5 pb-10 text-xs text-dusk sm:px-8">

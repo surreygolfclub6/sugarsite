@@ -18,6 +18,6 @@ export const CONSENT_VERSION = "2026-10-17";
 export const COMPANY = {
   name: "[Company name]",
   address: "[Registered address]",
-  email: "[support email address]",
-  privacyEmail: "[privacy contact email address]",
+  email: "support@mail.sugarmatch.site",
+  privacyEmail: "support@mail.sugarmatch.site",
 };

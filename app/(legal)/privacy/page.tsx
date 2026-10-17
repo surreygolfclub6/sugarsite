@@ -11,7 +11,7 @@ export default function PrivacyPage() {
       <p>
         {COMPANY.name} (“we”, “us”) runs {SITE_NAME} and is the controller of your personal data. This policy explains
         what we collect, why, who sees it and what your rights are. Contact us about your data at{" "}
-        {COMPANY.privacyEmail}.
+        <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a>.
       </p>
 
       <h2>What we collect</h2>
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
         <li>give you a copy of your data: use More, Account and security, Download my data;</li>
         <li>correct it: use More, Edit profile (contact us to correct your date of birth);</li>
         <li>delete it: use More, Account and security, Delete account;</li>
-        <li>restrict or object to how we use it, or move it to another service: contact {COMPANY.privacyEmail}.</li>
+        <li>restrict or object to how we use it, or move it to another service: contact <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a>.</li>
       </ul>
       <p>
         If you’re unhappy with how we handle your data, please tell us first. You can also complain to the Information

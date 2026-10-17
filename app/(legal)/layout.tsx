@@ -25,6 +25,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
           <Link href="/terms" className="hover:text-pearl">Terms</Link>
           <Link href="/privacy" className="hover:text-pearl">Privacy</Link>
           <Link href="/safety" className="hover:text-pearl">Safety</Link>
+          <a href={`mailto:${COMPANY.email}`} className="hover:text-pearl">Contact</a>
         </nav>
         <p className="mt-4">{COMPANY.name} · {COMPANY.address}</p>
       </footer>

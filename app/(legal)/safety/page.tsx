@@ -76,7 +76,7 @@ export default function SafetyPage() {
 
       <h2>Talk to us</h2>
       <p>
-        Questions about safety on {SITE_NAME}: {COMPANY.email}. See also our <Link href="/terms">Terms</Link> and{" "}
+        Questions about safety on {SITE_NAME}: <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. See also our <Link href="/terms">Terms</Link> and{" "}
         <Link href="/privacy">Privacy Policy</Link>.
       </p>
     </>

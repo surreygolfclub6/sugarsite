@@ -34,7 +34,7 @@ export default function TermsPage() {
         </li>
         <li>
           If a check can’t confirm that you’re 18 or over, we can’t make your profile live. If you think the result is
-          wrong, contact us at {COMPANY.email}.
+          wrong, contact us at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
         </li>
         <li>
           Members who pass the check show an “Age verified” badge. The badge means a check confirmed that the person is
@@ -111,7 +111,7 @@ export default function TermsPage() {
       </p>
 
       <h2>Contact</h2>
-      <p>Questions about these terms: {COMPANY.email}.</p>
+      <p>Questions about these terms: <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.</p>
     </>
   );
 }

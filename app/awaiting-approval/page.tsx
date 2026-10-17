@@ -4,7 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { SITE_NAME } from "@/lib/config";
+import { COMPANY, SITE_NAME } from "@/lib/config";
 import { signOut } from "@/app/(auth)/actions";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { setupPath } from "@/lib/member-status";
@@ -37,7 +37,7 @@ async function Waiting() {
       {declined ? (
         <p className="mt-4 text-dusk">
           After reviewing your profile we weren’t able to approve it for {SITE_NAME}. If you think this is a mistake,
-          please contact us.
+          please email <a href={`mailto:${COMPANY.email}`} className="text-pearl underline underline-offset-2">{COMPANY.email}</a>.
         </p>
       ) : (
         <>

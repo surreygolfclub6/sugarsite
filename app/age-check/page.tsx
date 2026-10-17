@@ -4,7 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { SITE_NAME } from "@/lib/config";
+import { COMPANY, SITE_NAME } from "@/lib/config";
 import { ageCheckEnabled } from "@/lib/age-assurance";
 
 export const metadata: Metadata = { title: "Verify your age" };
@@ -64,6 +64,9 @@ async function AgeCheck({ searchParams }: { searchParams: Promise<{ error?: stri
       </ul>
 
       <p className="mt-8 text-sm text-dusk">
+        Need help?{" "}
+        <a href={`mailto:${COMPANY.email}`} className="text-pearl underline underline-offset-2">{COMPANY.email}</a>
+        <br />
         Changed your mind?{" "}
         <Link href="/more/account" className="text-pearl underline underline-offset-2">Delete your account</Link>
       </p>
