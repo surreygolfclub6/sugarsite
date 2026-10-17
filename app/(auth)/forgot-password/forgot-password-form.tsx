@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { Captcha, CAPTCHA_SITE_KEY } from "@/components/captcha";
 import { requestPasswordReset, type AuthState } from "../actions";
 
 export function ForgotPasswordForm() {
   const [state, action, pending] = useActionState<AuthState, FormData>(requestPasswordReset, {});
+  const [captchaReady, setCaptchaReady] = useState(!CAPTCHA_SITE_KEY);
   return (
     <div>
       <h1 className="display text-4xl">Reset your password</h1>
@@ -16,11 +18,12 @@ export function ForgotPasswordForm() {
           <label htmlFor="email" className="mb-1.5 block text-sm font-medium">Email</label>
           <input id="email" name="email" type="email" autoComplete="email" required className="field" />
         </div>
+        <Captcha onReadyChange={setCaptchaReady} resetKey={state} />
         <div aria-live="polite">
           {state.error && <p className="text-sm text-danger">{state.error}</p>}
           {state.notice && <p className="text-sm text-brass">{state.notice}</p>}
         </div>
-        <button type="submit" disabled={pending} className="btn btn-primary w-full">
+        <button type="submit" disabled={pending || !captchaReady} className="btn btn-primary w-full">
           {pending ? "Sending…" : "Send reset link"}
         </button>
       </form>

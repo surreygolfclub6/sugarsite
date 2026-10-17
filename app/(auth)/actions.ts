@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { CONSENT_VERSION, SITE_URL } from "@/lib/config";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { CAPTCHA_MESSAGE, captchaToken, isCaptchaError } from "@/lib/captcha";
 
 export type AuthState = { error?: string; notice?: string };
 
@@ -40,9 +41,11 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
     ...parsed.data,
     options: {
       emailRedirectTo: `${SITE_URL}/auth/callback?next=/onboarding`,
+      captchaToken: captchaToken(formData),
     },
   });
 
+  if (isCaptchaError(error)) return { error: CAPTCHA_MESSAGE };
   if (error) return { error: error.message };
 
   // Keep a record of what they agreed to, and when. Members can't write these columns themselves.
@@ -70,7 +73,8 @@ export async function signIn(_: AuthState, formData: FormData): Promise<AuthStat
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { error } = await supabase.auth.signInWithPassword({ ...parsed.data, options: { captchaToken: captchaToken(formData) } });
+  if (isCaptchaError(error)) return { error: CAPTCHA_MESSAGE };
   if (error) return { error: "Email or password is incorrect." };
 
   redirect(safeNext(formData.get("next")));
@@ -90,7 +94,9 @@ export async function requestPasswordReset(_: AuthState, formData: FormData): Pr
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: `${SITE_URL}/auth/callback?next=/reset-password`,
+    captchaToken: captchaToken(formData),
   });
+  if (isCaptchaError(error)) return { error: CAPTCHA_MESSAGE };
   if (error?.code === "over_email_send_rate_limit" || error?.status === 429) {
     return { error: "Too many requests. Please wait a few minutes and try again." };
   }

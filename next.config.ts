@@ -2,15 +2,16 @@ import type { NextConfig } from "next";
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Supabase serves the photos (signed URLs) and the realtime socket. Scripts and styles need
+// Supabase serves the photos (signed URLs) and the realtime socket; hCaptcha loads its widget from hcaptcha.com. Scripts and styles need
 // 'unsafe-inline' because Next.js injects inline bootstrap code; everything else is locked to this site.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
+  "style-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
+  "frame-src https://hcaptcha.com https://*.hcaptcha.com",
   "img-src 'self' data: blob: https://*.supabase.co",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://hcaptcha.com https://*.hcaptcha.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

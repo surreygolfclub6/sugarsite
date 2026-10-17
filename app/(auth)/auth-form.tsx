@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { SITE_NAME } from "@/lib/config";
-import { Suspense, useActionState } from "react";
+import { Suspense, useActionState, useState } from "react";
+import { Captcha, CAPTCHA_SITE_KEY } from "@/components/captcha";
 import { signIn, signUp, type AuthState } from "./actions";
 
 // Reads ?next= on the client, behind its own Suspense, so the form itself is part of the static
@@ -29,6 +30,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     {},
   );
   const isLogin = mode === "login";
+  const [captchaReady, setCaptchaReady] = useState(!CAPTCHA_SITE_KEY);
 
   return (
     <div>
@@ -99,12 +101,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </p>
         )}
 
+        <Captcha onReadyChange={setCaptchaReady} resetKey={state} />
+
         <div aria-live="polite">
           {state.error && <p className="text-sm text-danger">{state.error}</p>}
           {state.notice && <p className="text-sm text-brass">{state.notice}</p>}
         </div>
 
-        <button type="submit" disabled={pending} className="btn btn-primary w-full">
+        <button type="submit" disabled={pending || !captchaReady} className="btn btn-primary w-full">
           {pending ? (isLogin ? "Signing in…" : "Creating account…") : isLogin ? "Sign in" : "Create account"}
         </button>
       </form>

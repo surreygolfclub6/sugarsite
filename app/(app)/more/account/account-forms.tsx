@@ -1,10 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { Captcha, CAPTCHA_SITE_KEY } from "@/components/captcha";
 import { changePassword, deleteAccount, type AccountState } from "./actions";
 
 export function ChangePasswordForm() {
   const [state, action, pending] = useActionState<AccountState, FormData>(changePassword, {});
+  const [captchaReady, setCaptchaReady] = useState(!CAPTCHA_SITE_KEY);
   return (
     <form action={action} className="space-y-4" aria-label="Change password" noValidate>
       <div>
@@ -20,17 +22,19 @@ export function ChangePasswordForm() {
         <label htmlFor="confirm" className="mb-1.5 block text-sm font-medium">Confirm new password</label>
         <input id="confirm" name="confirm" type="password" autoComplete="new-password" className="field" />
       </div>
+      <Captcha onReadyChange={setCaptchaReady} resetKey={state} />
       <div aria-live="polite">
         {state.error && <p className="text-sm text-danger">{state.error}</p>}
         {state.notice && <p className="text-sm text-brass">{state.notice}</p>}
       </div>
-      <button type="submit" disabled={pending} className="btn btn-primary">{pending ? "Saving…" : "Change password"}</button>
+      <button type="submit" disabled={pending || !captchaReady} className="btn btn-primary">{pending ? "Saving…" : "Change password"}</button>
     </form>
   );
 }
 
 export function DeleteAccountForm() {
   const [state, action, pending] = useActionState<AccountState, FormData>(deleteAccount, {});
+  const [captchaReady, setCaptchaReady] = useState(!CAPTCHA_SITE_KEY);
   return (
     <form action={action} className="space-y-4" aria-label="Delete account" noValidate>
       <p className="text-sm text-dusk">
@@ -45,8 +49,9 @@ export function DeleteAccountForm() {
         <input type="checkbox" name="confirm" value="yes" className="mt-1 size-4 accent-[var(--garnet)]" />
         <span>I understand this is permanent.</span>
       </label>
+      <Captcha onReadyChange={setCaptchaReady} resetKey={state} />
       <div aria-live="polite">{state.error && <p className="text-sm text-danger">{state.error}</p>}</div>
-      <button type="submit" disabled={pending} className="btn btn-quiet text-danger">{pending ? "Deleting…" : "Delete my account"}</button>
+      <button type="submit" disabled={pending || !captchaReady} className="btn btn-quiet text-danger">{pending ? "Deleting…" : "Delete my account"}</button>
     </form>
   );
 }

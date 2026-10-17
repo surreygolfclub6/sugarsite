@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { CAPTCHA_MESSAGE, captchaToken, isCaptchaError } from "@/lib/captcha";
 
 export type AccountState = { error?: string; notice?: string };
 
@@ -17,10 +18,12 @@ async function signedIn() {
 }
 
 // Re-checking the password stops someone at an unattended screen from changing it or deleting the account.
-async function passwordIsRight(supabase: Awaited<ReturnType<typeof createClient>>, email: string, password: unknown) {
-  if (typeof password !== "string" || !password) return false;
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  return !error;
+// Signing in again counts as a sign-in for Supabase's CAPTCHA protection, so the form sends a token too.
+async function passwordIsRight(supabase: Awaited<ReturnType<typeof createClient>>, email: string, password: unknown, formData: FormData) {
+  if (typeof password !== "string" || !password) return "wrong" as const;
+  const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken: captchaToken(formData) } });
+  if (isCaptchaError(error)) return "captcha" as const;
+  return error ? ("wrong" as const) : ("ok" as const);
 }
 
 export async function changePassword(_: AccountState, formData: FormData): Promise<AccountState> {
@@ -28,7 +31,9 @@ export async function changePassword(_: AccountState, formData: FormData): Promi
   const next = z.string().min(10, "Use at least 10 characters for your new password.").safeParse(formData.get("password"));
   if (!next.success) return { error: next.error.issues[0].message };
   if (formData.get("confirm") !== next.data) return { error: "The two new passwords don’t match." };
-  if (!(await passwordIsRight(supabase, email, formData.get("current")))) return { error: "Your current password is incorrect." };
+  const check = await passwordIsRight(supabase, email, formData.get("current"), formData);
+  if (check === "captcha") return { error: CAPTCHA_MESSAGE };
+  if (check !== "ok") return { error: "Your current password is incorrect." };
 
   const { error } = await supabase.auth.updateUser({ password: next.data });
   if (error) return { error: error.message };
@@ -38,7 +43,9 @@ export async function changePassword(_: AccountState, formData: FormData): Promi
 export async function deleteAccount(_: AccountState, formData: FormData): Promise<AccountState> {
   const { supabase, user, email } = await signedIn();
   if (formData.get("confirm") !== "yes") return { error: "Tick the box to confirm you want to delete your account." };
-  if (!(await passwordIsRight(supabase, email, formData.get("password")))) return { error: "Your password is incorrect." };
+  const check = await passwordIsRight(supabase, email, formData.get("password"), formData);
+  if (check === "captcha") return { error: CAPTCHA_MESSAGE };
+  if (check !== "ok") return { error: "Your password is incorrect." };
 
   // Deleting the user removes the profile and, through cascading deletes, photos, likes, blocks,
   // conversations and messages. The photo files in storage are separate, so clear those too.
