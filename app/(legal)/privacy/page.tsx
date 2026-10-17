@@ -77,6 +77,7 @@ export default function PrivacyPage() {
           have become real members. This uses counts, not the content of your messages (our legitimate interests in keeping the
           community genuine). We also record likes so we can show you your matches.
         </li>
+        <li>To email you when someone sends you a message. The email says who wrote, never what they wrote, and we send at most one an hour per conversation. You can turn these off under More, then Account and security, or with the link in the email (our legitimate interests, and the service you asked for).</li>
         <li>To meet legal obligations, and to deal with legal claims (legal obligation, legitimate interests).</li>
         <li>For special category data, your explicit consent.</li>
       </ul>

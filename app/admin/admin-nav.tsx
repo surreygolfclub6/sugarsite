@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 
-export async function AdminNav({ current }: { current: "approvals" | "photos" | "reports" | "security" }) {
+export async function AdminNav({ current }: { current: "approvals" | "photos" | "reports" | "members" | "security" }) {
   const { admin } = await requireAdmin();
   const [{ count: approvals }, { data: pending }, { count: reports }] = await Promise.all([
     admin.from("profiles").select("id", { count: "exact", head: true }).eq("status", "awaiting_approval"),
@@ -26,6 +26,7 @@ export async function AdminNav({ current }: { current: "approvals" | "photos" | 
       {tab("/admin/approvals", "Approvals", approvals ?? 0, current === "approvals")}
       {tab("/admin", "Photos", photoProfiles, current === "photos")}
       {tab("/admin/reports", "Reports", reports ?? 0, current === "reports")}
+      {tab("/admin/members", "Members", 0, current === "members")}
       {tab("/admin/mfa", "Security", 0, current === "security")}
     </nav>
   );

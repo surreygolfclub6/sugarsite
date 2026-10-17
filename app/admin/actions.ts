@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
 import { REJECTION_REASONS } from "@/lib/photo-review";
@@ -105,4 +106,16 @@ export async function declineMember(formData: FormData) {
   if (!updated?.length) return;
   await record(admin, user.id, "member_declined", profileId, { reason });
   revalidatePath("/admin/approvals");
+}
+
+// Marks a member as a tester (Champion limits, whatever their record) or removes it again.
+export async function setTester(formData: FormData) {
+  const { user, admin } = await requireAdmin();
+  const profileId = uuid.parse(formData.get("profile_id"));
+  const on = formData.get("tester") === "on";
+  const back = String(formData.get("back") ?? "");
+  await admin.from("profiles").update({ is_tester: on }).eq("id", profileId);
+  await record(admin, user.id, on ? "tester_on" : "tester_off", profileId);
+  revalidatePath("/admin/members");
+  redirect(back.startsWith("/admin/members") ? back : "/admin/members");
 }

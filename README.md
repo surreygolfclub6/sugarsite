@@ -106,3 +106,9 @@ their next sign-in: `delete from auth.mfa_factors where user_id = '<their user i
 - `npm run dev` for development, `npx playwright test` for the end-to-end suite (it reuses a running server; set `E2E_BASE_URL` to test another).
 - To check a production build beside the dev server: `NEXT_BUILD_DIR=.next-build npm run build`, then `NEXT_BUILD_DIR=.next-build npx next start -p 3100` and `E2E_BASE_URL=http://localhost:3100 npx playwright test`. This caught problems the dev server hid, so run it before launch.
 - For password reset links that work when the email is opened on another device, change the Supabase email templates to link to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery` (and `type=signup` for confirmation).
+
+## Notifications, testers and the Members page
+
+- New-message emails: `lib/notify.ts` emails the recipient (who wrote, never what) through Resend's API (`lib/email.ts`). It needs `RESEND_API_KEY` in the environment (the same Resend account as sign-in emails) and optionally `EMAIL_FROM` (default `SugarMatch <notifications@mail.sugarmatch.site>`, any address on the verified sending domain). Without the key nothing is sent. One email per conversation per hour, none if the recipient was online in the last 5 minutes or has turned them off (More, Account and security, or the signed unsubscribe link: `/unsubscribe`, with List-Unsubscribe one-click at `/unsubscribe/one-click`).
+- Likes and matches appear inside the open conversation (a like arrives live; a match line once you have both liked).
+- `/admin/members`: every member with status, level and last active, search by name or email, filter by status or testers. Make tester sets `profiles.is_tester`, which gives Champion limits (`member_tier`), and is recorded in `moderation_log`.

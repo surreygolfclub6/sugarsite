@@ -50,6 +50,16 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
     supabase.from("photo_shares").select("viewer_id").eq("owner_id", user.id).eq("viewer_id", otherId).maybeSingle(),
   ]);
 
+  // Likes between the two of you, so a like and a match appear in the conversation.
+  const { data: likeRows } = await supabase
+    .from("likes")
+    .select("from_user, to_user, created_at")
+    .or(`and(from_user.eq.${user.id},to_user.eq.${otherId}),and(from_user.eq.${otherId},to_user.eq.${user.id})`);
+  const likes = {
+    mine: likeRows?.find((l) => l.from_user === user.id)?.created_at ?? null,
+    theirs: likeRows?.find((l) => l.from_user === otherId)?.created_at ?? null,
+  };
+
   const initial = await withPhotoUrls(supabase, rows.slice(0, PAGE).reverse());
 
   // Your own approved photos, to pick from when you want to send one.
@@ -74,6 +84,7 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
       sharing={{ canShare: (privateCount ?? 0) > 0, shared: Boolean(share) }}
       other={{ id: other.id, name: other.display_name ?? "Member", photo, online: isOnline(other.last_active_at), verified: other.age_verified }}
       myPhotos={myPhotos}
+      likes={likes}
       initial={initial}
       hasEarlier={rows.length > PAGE}
     />

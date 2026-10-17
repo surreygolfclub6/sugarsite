@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AgeBadge } from "@/components/age-badge";
 import { SafetyMenu } from "@/components/safety-menu";
 import { SharePhotosButton } from "@/components/share-photos-button";
@@ -9,6 +9,8 @@ import { createClient, realtimeReady } from "@/lib/supabase/client";
 import { loadEarlier, loadSince, markRead, photoUrl, sendMessage, type Message } from "../actions";
 
 type Msg = Message & { pending?: boolean };
+// When each of you liked the other (ISO times). Both set means a match.
+type Likes = { mine: string | null; theirs: string | null };
 type MyPhoto = { id: string; url: string; private: boolean };
 type Other = { id: string; name: string; photo: string | null; online: boolean; verified: boolean };
 
@@ -38,6 +40,7 @@ export function Thread({
   other,
   sharing,
   myPhotos,
+  likes: initialLikes,
   initial,
   hasEarlier: initialHasEarlier,
 }: {
@@ -46,6 +49,7 @@ export function Thread({
   other: Other;
   sharing: { canShare: boolean; shared: boolean };
   myPhotos: MyPhoto[];
+  likes: Likes;
   initial: Message[];
   hasEarlier: boolean;
 }) {
@@ -54,6 +58,7 @@ export function Thread({
   const [hasEarlier, setHasEarlier] = useState(initialHasEarlier);
   const [text, setText] = useState("");
   const [error, setError] = useState<string>();
+  const [likes, setLikes] = useState<Likes>(initialLikes);
   const [picking, setPicking] = useState(false);
   const [attached, setAttached] = useState<MyPhoto>();
   const scroller = useRef<HTMLDivElement>(null);
@@ -104,6 +109,10 @@ export function Thread({
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter }, (payload) => {
           merge(payload.new as Message);
         })
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "likes", filter: `to_user=eq.${meId}` }, (payload) => {
+          const like = payload.new as { from_user: string; created_at: string };
+          if (like.from_user === other.id) setLikes((cur) => ({ ...cur, theirs: like.created_at }));
+        })
         .subscribe(async (status) => {
           if (status !== "SUBSCRIBED") {
             reconnecting = true;
@@ -121,7 +130,7 @@ export function Thread({
       alive = false;
       if (channel) void supabase.removeChannel(channel);
     };
-  }, [supabase, conversationId, meId, merge, read]);
+  }, [supabase, conversationId, meId, other.id, merge, read]);
 
   useLayoutEffect(() => {
     const el = scroller.current;
@@ -172,6 +181,15 @@ export function Thread({
     );
   }
 
+  // Messages and likes in one time-ordered list: a like, and a match once you've both liked, show up in the chat itself.
+  const timeline = useMemo(() => {
+    const items: ({ kind: "message"; at: number; m: Msg } | { kind: "event"; at: number; id: string; text: string })[] = messages.map((m) => ({ kind: "message", at: Date.parse(m.created_at), m }));
+    if (likes.mine) items.push({ kind: "event", at: Date.parse(likes.mine), id: "like-mine", text: `You liked ${other.name}` });
+    if (likes.theirs) items.push({ kind: "event", at: Date.parse(likes.theirs), id: "like-theirs", text: `${other.name} liked you` });
+    if (likes.mine && likes.theirs) items.push({ kind: "event", at: Math.max(Date.parse(likes.mine), Date.parse(likes.theirs)) + 1, id: "match", text: `It’s a match! You and ${other.name} liked each other.` });
+    return items.sort((a, b) => a.at - b.at);
+  }, [messages, likes, other.name]);
+
   const lastMine = [...messages].reverse().find((m) => m.sender_id === meId);
 
   return (
@@ -221,7 +239,15 @@ export function Thread({
           {messages.length === 0 && (
             <p className="py-10 text-center text-dusk">Say hello to {other.name}. A friendly, specific first message works best.</p>
           )}
-          {messages.map((m) => {
+          {timeline.map((item) => {
+            if (item.kind === "event") {
+              return (
+                <p key={item.id} data-event={item.id} className={`mx-auto my-1 rounded-full border px-3.5 py-1.5 text-center text-xs ${item.id === "match" ? "border-brass text-brass" : "border-line text-dusk"}`}>
+                  {item.id === "match" ? "♥ " : ""}{item.text}
+                </p>
+              );
+            }
+            const m = item.m;
             const mine = m.sender_id === meId;
             return (
               <div key={m.id} data-message={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>

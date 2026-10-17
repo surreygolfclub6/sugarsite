@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { FREE_NEW_CONVERSATIONS_PER_DAY } from "@/lib/config";
 import { withPhotoUrls } from "@/lib/chat-photos";
+import { notifyNewMessage } from "@/lib/notify";
 
 export type Message = {
   id: string;
@@ -69,6 +71,8 @@ export async function sendMessage(
     };
   }
   const [message] = await withPhotoUrls(supabase, [data]);
+  // The email goes out after the reply is sent, so sending a message never waits on it (or fails because of it).
+  after(() => notifyNewMessage(parsed.data.id, user.id).catch(() => {}));
   return { message };
 }
 

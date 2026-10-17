@@ -26,6 +26,13 @@ async function passwordIsRight(supabase: Awaited<ReturnType<typeof createClient>
   return error ? ("wrong" as const) : ("ok" as const);
 }
 
+// Turns email notifications for new messages on or off. Stored with the server's key, so other members never see it.
+export async function setEmailNotifications(formData: FormData) {
+  const { user } = await signedIn();
+  await createAdminClient().from("profiles").update({ email_notifications: formData.get("notify") === "on" }).eq("id", user.id);
+  redirect("/more/account?saved=notifications");
+}
+
 export async function changePassword(_: AccountState, formData: FormData): Promise<AccountState> {
   const { supabase, email } = await signedIn();
   const next = z.string().min(10, "Use at least 10 characters for your new password.").safeParse(formData.get("password"));
