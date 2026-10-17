@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MIN_AGE } from "@/lib/config";
 import { ageCheckEnabled } from "@/lib/age-assurance";
+import { approvalRequired } from "@/lib/approval";
 import { ONBOARDING_STEP_FIELDS } from "@/lib/profile-options";
 import { profileInput, profileSchema } from "@/lib/profile-schema";
 
@@ -103,12 +104,15 @@ export async function completeOnboarding(
   // Status can't be changed by members, so move it forward server-side. With age checks on, the profile
   // waits (pending_review) until the member passes the check; otherwise it goes live immediately.
   // Either way only photos wait for moderator review.
+  // The order is: finish the profile, pass the age check, wait for approval, go live. A step is skipped when it's off.
   const checkAge = ageCheckEnabled();
+  const needsApproval = await approvalRequired();
+  const next = checkAge ? "pending_review" : needsApproval ? "awaiting_approval" : "active";
   await admin
     .from("profiles")
-    .update({ status: checkAge ? "pending_review" : "active" })
+    .update({ status: next })
     .eq("id", user.id)
     .eq("status", "incomplete");
 
-  redirect(checkAge ? "/age-check" : "/discover");
+  redirect(checkAge ? "/age-check" : needsApproval ? "/awaiting-approval" : "/discover");
 }

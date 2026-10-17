@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
 import { REJECTION_REASONS } from "@/lib/photo-review";
+import { DECLINE_REASONS } from "@/lib/decline-reasons";
 
 const uuid = z.string().uuid();
 
@@ -64,4 +65,44 @@ export async function resolveReport(formData: FormData) {
   await record(admin, user.id, `report_${outcome}`, report.reported, { report_id: reportId });
   revalidatePath("/admin/reports");
   revalidatePath("/admin");
+}
+
+// ---- Account approval (testing phase) ----
+
+
+// Approving a member makes their profile live. Their photos are on this page for the decision, so any that are
+// still waiting are approved with it.
+export async function approveMember(formData: FormData) {
+  const { user, admin } = await requireAdmin();
+  const profileId = uuid.parse(formData.get("profile_id"));
+  const { data: updated } = await admin
+    .from("profiles")
+    .update({ status: "active" })
+    .eq("id", profileId)
+    .eq("status", "awaiting_approval")
+    .select("id");
+  if (!updated?.length) return;
+  await admin
+    .from("photos")
+    .update({ moderation: "approved", rejection_reason: null, reviewed_by: user.id, reviewed_at: new Date().toISOString() })
+    .eq("user_id", profileId)
+    .eq("moderation", "pending");
+  await record(admin, user.id, "member_approved", profileId);
+  revalidatePath("/admin/approvals");
+  revalidatePath("/admin");
+}
+
+export async function declineMember(formData: FormData) {
+  const { user, admin } = await requireAdmin();
+  const profileId = uuid.parse(formData.get("profile_id"));
+  const reason = z.enum(DECLINE_REASONS.map((r) => r.value) as [string, ...string[]]).parse(formData.get("reason"));
+  const { data: updated } = await admin
+    .from("profiles")
+    .update({ status: "declined" })
+    .eq("id", profileId)
+    .eq("status", "awaiting_approval")
+    .select("id");
+  if (!updated?.length) return;
+  await record(admin, user.id, "member_declined", profileId, { reason });
+  revalidatePath("/admin/approvals");
 }

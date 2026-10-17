@@ -44,6 +44,24 @@ The database enforces the gate too: a member who isn't live can't see other memb
 in the RLS policies). Only the outcome is stored (`age_checks`), and one verification can back one account.
 Confirm with AgeVerif which assurance level counts as highly effective for UK law and set `MIN_ASSURANCE` in `lib/age-assurance.ts`.
 
+## Account approval (testing phase)
+
+While `app_flags.require_approval` is true, a new member waits for a moderator after finishing their profile and passing the
+age check: incomplete, pending_review (age check), awaiting_approval, active. Moderators decide at `/admin/approvals`
+(approving also approves the member's photos; declining sets `declined`). Turn it off at launch with
+`update app_flags set value = false where key = 'require_approval';`. Members who were already active are unaffected.
+
+## Admin two-step sign-in
+
+Admins (rows in `admins`) must enter a code from an authenticator app before any admin page or action works, and again
+after 8 hours (`lib/admin.ts`). The first sign-in goes to `/admin/mfa` to set it up; `/admin/mfa` also lets an admin add a
+second device or remove one (the last can't be removed). `is_admin()` in the database also needs an aal2 session, so a
+stolen admin password can't read other members' data through the API either. Every moderator decision and every code
+attempt is recorded in `moderation_log`; five wrong codes lock the screen for 15 minutes.
+
+If an admin loses every authenticator, remove their factors in the Supabase SQL editor, then they set up a new one at
+their next sign-in: `delete from auth.mfa_factors where user_id = '<their user id>';`
+
 ## Not built yet
 
 - Email or push notifications for new messages and likes, and custom SMTP (Supabase's built-in sender allows only a few emails an hour)

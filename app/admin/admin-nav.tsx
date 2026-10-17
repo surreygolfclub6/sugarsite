@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 
-export async function AdminNav({ current }: { current: "photos" | "reports" }) {
+export async function AdminNav({ current }: { current: "approvals" | "photos" | "reports" | "security" }) {
   const { admin } = await requireAdmin();
-  const [{ data: pending }, { count: reports }] = await Promise.all([
+  const [{ count: approvals }, { data: pending }, { count: reports }] = await Promise.all([
+    admin.from("profiles").select("id", { count: "exact", head: true }).eq("status", "awaiting_approval"),
     admin.from("photos").select("user_id").eq("moderation", "pending"),
     admin.from("reports").select("id", { count: "exact", head: true }).eq("status", "open"),
   ]);
@@ -21,9 +22,11 @@ export async function AdminNav({ current }: { current: "photos" | "reports" }) {
   );
 
   return (
-    <nav aria-label="Admin" className="mt-6 flex border-b border-line">
+    <nav aria-label="Admin" className="mt-6 flex overflow-x-auto border-b border-line">
+      {tab("/admin/approvals", "Approvals", approvals ?? 0, current === "approvals")}
       {tab("/admin", "Photos", photoProfiles, current === "photos")}
       {tab("/admin/reports", "Reports", reports ?? 0, current === "reports")}
+      {tab("/admin/mfa", "Security", 0, current === "security")}
     </nav>
   );
 }

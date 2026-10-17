@@ -16,7 +16,7 @@ async function More() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const { data: isAdmin } = await supabase.rpc("is_admin", { uid: user.id });
+  const { data: isAdmin } = await supabase.rpc("is_admin_user", { uid: user.id });
 
   const link = "block rounded-xl border border-line px-4 py-4 hover:bg-velvet";
   return (

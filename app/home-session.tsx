@@ -18,6 +18,7 @@ const getMember = cache(async () => {
 function appLink(member: { status: string }) {
   if (member.status === "incomplete") return { href: "/onboarding", label: "Finish your profile" };
   if (member.status === "pending_review") return { href: "/age-check", label: "Verify your age" };
+  if (member.status === "awaiting_approval" || member.status === "declined") return { href: "/awaiting-approval", label: "Check your approval" };
   return { href: "/discover", label: "Open SugarMatch" };
 }
 
@@ -38,6 +39,7 @@ function HeaderSignedOut() {
 function menuItems(member: { status: string }): MenuItem[] {
   if (member.status === "incomplete") return [{ href: "/onboarding", label: "Finish your profile", icon: "profile" }];
   if (member.status === "pending_review") return [{ href: "/age-check", label: "Verify your age", icon: "shield" }];
+  if (member.status === "awaiting_approval" || member.status === "declined") return [{ href: "/awaiting-approval", label: "Approval status", icon: "shield" }];
   return [
     { href: "/discover", label: "Search", icon: "search" },
     { href: "/messages", label: "Messages", icon: "messages" },

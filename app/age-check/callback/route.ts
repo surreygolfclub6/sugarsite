@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { exchangeCode, expiryDate, fetchVerification, judge } from "@/lib/age-assurance";
 import { requestOrigin } from "@/lib/origin";
+import { approvalRequired } from "@/lib/approval";
 
 // AgeVerif sends the member back here with ?code=&state=. The verdict is fetched server-to-server and only a
 // pass makes the profile live. Nothing from the browser is trusted except the one-time code.
@@ -57,6 +58,12 @@ export async function GET(request: NextRequest) {
     return done(back(saveError.code === "23505" ? "used" : "unavailable"));
   }
 
-  await admin.from("profiles").update({ status: "active", age_verified: true }).eq("id", user.id).eq("status", "pending_review");
-  return done(NextResponse.redirect(`${origin}/discover`));
+  // Passing the check makes the profile live, unless new members have to be approved first.
+  const needsApproval = await approvalRequired();
+  await admin
+    .from("profiles")
+    .update({ status: needsApproval ? "awaiting_approval" : "active", age_verified: true })
+    .eq("id", user.id)
+    .eq("status", "pending_review");
+  return done(NextResponse.redirect(`${origin}${needsApproval ? "/awaiting-approval" : "/discover"}`));
 }
