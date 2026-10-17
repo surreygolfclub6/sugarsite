@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
-export function Gallery({ name, urls, menu }: { name: string; urls: string[]; menu?: React.ReactNode }) {
+export type GalleryPhoto = { url: string; private?: boolean };
+
+export function Gallery({ name, photos, locked = 0, ownerView = false, menu }: { name: string; photos: GalleryPhoto[]; locked?: number; ownerView?: boolean; menu?: React.ReactNode }) {
+  const urls = photos.map((p) => p.url);
   const router = useRouter();
   const scroller = useRef<HTMLUListElement>(null);
   const [index, setIndex] = useState(0);
@@ -18,16 +21,24 @@ export function Gallery({ name, urls, menu }: { name: string; urls: string[]; me
           className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto"
         >
           {urls.map((url, i) => (
-            <li key={url} className="w-full shrink-0 snap-center">
+            <li key={url} className="relative w-full shrink-0 snap-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt={`${name}’s photo ${i + 1}`} className="aspect-[4/5] w-full object-cover" />
+              <img src={url} alt={`${name}’s ${photos[i].private ? "private " : ""}photo ${i + 1}`} className="aspect-[4/5] w-full object-cover" />
+              {photos[i].private && (
+                <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-xs text-white backdrop-blur">
+                  <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                  </svg>
+                  {ownerView ? "Private, only people you share with" : "Private, shared with you"}
+                </span>
+              )}
             </li>
           ))}
         </ul>
       ) : (
-        <div role="img" aria-label="Photo coming soon" className="grid aspect-[4/5] w-full place-items-center text-sm text-dusk">
+        <div role="img" aria-label="No public photo" className="grid aspect-[4/5] w-full place-items-center text-sm text-dusk">
           <span className="display text-8xl">{name.slice(0, 1)}</span>
-          <span>Photo coming soon</span>
+          <span>{locked > 0 ? "Photos are private" : "No public photo"}</span>
         </div>
       )}
 

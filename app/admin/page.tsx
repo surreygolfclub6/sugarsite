@@ -24,7 +24,7 @@ async function Queue() {
 
   const { data: pending } = await admin
     .from("photos")
-    .select("id, user_id, storage_path, created_at")
+    .select("id, user_id, storage_path, created_at, visibility")
     .eq("moderation", "pending")
     .order("created_at");
 
@@ -79,8 +79,11 @@ async function Queue() {
                 .filter((p) => p.user_id === u.id)
                 .map((p) => (
                   <li key={p.id} className="space-y-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={urlFor(p.storage_path)} alt="Pending photo" className="aspect-[3/4] w-full rounded-xl border border-line object-cover" />
+                    <div className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={urlFor(p.storage_path)} alt={`Pending ${p.visibility} photo`} className="aspect-[3/4] w-full rounded-xl border border-line object-cover" />
+                      <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">{p.visibility === "private" ? "Private" : "Public"}</span>
+                    </div>
                     <form action={rejectPhoto} className="flex gap-2">
                       <input type="hidden" name="photo_id" value={p.id} />
                       <select name="reason" aria-label="Rejection reason" defaultValue="other" className="field !py-2 text-sm">

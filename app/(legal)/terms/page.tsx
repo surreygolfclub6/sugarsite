@@ -76,6 +76,7 @@ export default function TermsPage() {
         <li>Photos must show you. No one else’s photos, and no images that aren’t of a person.</li>
         <li>No nudity, explicit or sexual images, or content that’s offensive or hateful.</li>
         <li>Every photo is checked by a person before other members can see it. We can reject or remove any photo.</li>
+        <li>You can mark a photo private. Private photos are not shown on your public profile or in search, and are visible only to you, our moderators and the members you choose to share them with. Moderators still review every private photo. Anyone you share with could save or screenshot a photo, so only share with people you trust. You can stop sharing at any time, but that can’t undo what someone has already seen or saved.</li>
       </ul>
 
       <h2>How to behave</h2>

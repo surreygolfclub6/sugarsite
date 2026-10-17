@@ -23,7 +23,7 @@ function Requirements({ level, progress }: { level: Level; progress?: Progress }
   const m = progress?.metrics;
   return (
     <ul className="space-y-2">
-      <Line done={m?.has_photo}>An approved photo</Line>
+      <Line done={m?.has_photo}>An approved photo (public or private)</Line>
       <Line done={m?.profile_ok}>A complete profile</Line>
       <Line done={m ? m.conversations >= level.minConversations : undefined}>
         {level.minConversations} conversations{m ? ` (${Math.min(m.conversations, level.minConversations)} so far)` : ""}
@@ -86,6 +86,7 @@ export function LevelLadder({ progress }: { progress?: Progress }) {
 // "How it's counted": the plain-language definitions behind the requirements.
 export function LevelDefinitions() {
   const items: [string, string][] = [
+    ["An approved photo", `is ${DEFINITIONS.photo}.`],
     ["A complete profile", `has ${DEFINITIONS.completeProfile}.`],
     ["A conversation", `is ${DEFINITIONS.conversation}.`],
     ["A good response record", `means ${DEFINITIONS.responseRecord}.`],

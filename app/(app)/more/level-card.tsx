@@ -79,7 +79,7 @@ export async function LevelCard({ userId }: { userId: string }) {
               You’d get {next.daily_conversations} new conversations a day and a {next.label} badge.
             </p>
             <ul className="mt-4 space-y-3">
-              {next.needs_photo && <Step done={m.has_photo}>Get a photo approved (<Link href="/photos" className="underline underline-offset-2">add or replace photos</Link>)</Step>}
+              {next.needs_photo && <Step done={m.has_photo}>Get a photo approved, public or private (<Link href="/photos" className="underline underline-offset-2">add or replace photos</Link>)</Step>}
               {next.needs_profile && <Step done={m.profile_ok}>Complete your profile (<Link href="/more/profile" className="underline underline-offset-2">edit profile</Link>)</Step>}
               {next.min_conversations > 0 && <Step done={m.conversations >= next.min_conversations}>Have {next.min_conversations} conversations, where you’ve both written ({Math.min(m.conversations, next.min_conversations)} so far)</Step>}
               {next.needs_responsive && <Step done={m.responsive}>Keep a good response record: answer at least half of the people who write to you first</Step>}

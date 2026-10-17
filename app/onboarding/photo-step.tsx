@@ -10,6 +10,7 @@ export type Photo = {
   url: string;
   moderation?: "pending" | "approved" | "rejected";
   reason?: string | null;
+  visibility?: "public" | "private";
 };
 
 export const MAX_PHOTOS = 6;
@@ -39,6 +40,8 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
   const [photos, setPhotos] = useState<Photo[]>(initial);
   const [busy, setBusy] = useState(0);
   const [error, setError] = useState<string>();
+  // New photos can start out private: only you, our team and the members you choose to share with will see them.
+  const [keepPrivate, setKeepPrivate] = useState(false);
   const input = useRef<HTMLInputElement>(null);
 
   async function add(files: FileList) {
@@ -56,14 +59,14 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
         if (uploadError) throw new Error("The upload failed. Please try again.");
         const { data, error: rowError } = await supabase
           .from("photos")
-          .insert({ user_id: userId, storage_path: path, position: position++ })
+          .insert({ user_id: userId, storage_path: path, position: position++, visibility: keepPrivate ? "private" : "public" })
           .select("id")
           .single();
         if (rowError || !data) {
           await supabase.storage.from("photos").remove([path]);
           throw new Error("We couldn’t save that photo. Please try again.");
         }
-        setPhotos((p) => [...p, { id: data.id, path, url: URL.createObjectURL(blob), moderation: "pending" }]);
+        setPhotos((p) => [...p, { id: data.id, path, url: URL.createObjectURL(blob), moderation: "pending", visibility: keepPrivate ? "private" : "public" }]);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Something went wrong.");
       } finally {
@@ -71,6 +74,13 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
       }
     }
     if (input.current) input.current.value = "";
+  }
+
+  async function setVisibility(photo: Photo, visibility: "public" | "private") {
+    setError(undefined);
+    const { error: updateError } = await supabase.from("photos").update({ visibility }).eq("id", photo.id);
+    if (updateError) return setError("We couldn’t change that photo. Please try again.");
+    setPhotos((all) => all.map((x) => (x.id === photo.id ? { ...x, visibility } : x)));
   }
 
   async function remove(photo: Photo) {
@@ -84,8 +94,13 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
   return (
     <div className="space-y-4">
       <p className="text-sm text-dusk">
-        Add 1 to {MAX_PHOTOS} photos of you. Your first photo is your main one. Every photo is checked by a person
-        before anyone else can see it.
+        Add 1 to {MAX_PHOTOS} photos of you. Every photo is checked by a person before anyone else can see it,
+        including private ones.
+      </p>
+      <p className="text-sm text-dusk">
+        <strong className="text-pearl">Public</strong> photos show on your profile and in search.{" "}
+        <strong className="text-pearl">Private</strong> photos are only seen by you, our team and the members you choose to
+        share them with. You can keep every photo private and still move up the levels.
       </p>
 
       <ul className="grid grid-cols-3 gap-3">
@@ -100,10 +115,23 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
                 className={`absolute bottom-1.5 left-1.5 right-1.5 rounded-lg bg-black/75 px-2 py-1 text-xs ${p.moderation === "rejected" ? "text-red-300" : "text-white"}`}
               >
                 {p.moderation === "pending" && "In review"}
-                {p.moderation === "approved" && "Live"}
+                {p.moderation === "approved" && (p.visibility === "private" ? "Approved, private" : "Live")}
                 {p.moderation === "rejected" && `Rejected: ${reasonLabel(p.reason ?? null)}`}
               </span>
             )}
+            <button
+              type="button"
+              data-visibility={p.visibility ?? "public"}
+              aria-pressed={p.visibility === "private"}
+              onClick={() => setVisibility(p, p.visibility === "private" ? "public" : "private")}
+              aria-label={`Photo ${i + 1} is ${p.visibility === "private" ? "private" : "public"}. Change it.`}
+              className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs text-white"
+            >
+              <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                {p.visibility === "private" ? <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></> : <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>}
+              </svg>
+              {p.visibility === "private" ? "Private" : "Public"}
+            </button>
             <button
               type="button"
               onClick={() => remove(p)}
@@ -122,7 +150,11 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
       </ul>
 
       {photos.length < MAX_PHOTOS && (
-        <div>
+        <div className="space-y-3">
+          <label className="flex items-start gap-3 text-sm">
+            <input type="checkbox" checked={keepPrivate} onChange={(e) => setKeepPrivate(e.target.checked)} className="mt-1 size-4" />
+            <span>Keep new photos private. I’ll choose who sees them.</span>
+          </label>
           <label htmlFor="photo_files" className="btn btn-quiet cursor-pointer">
             Add photos
           </label>

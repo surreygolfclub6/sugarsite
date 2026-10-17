@@ -169,7 +169,7 @@ const features = [
   },
   {
     title: "Private by design",
-    body: "Your exact location is never shown, only a rounded distance. Photos are scrubbed of hidden metadata before they’re uploaded.",
+    body: "Your exact location is never shown, only a rounded distance. Photos are scrubbed of hidden metadata, and you can keep any photo private and share it only with people you choose.",
   },
   {
     title: "Live messaging",

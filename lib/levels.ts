@@ -37,7 +37,7 @@ export const LEVELS: Level[] = [
     minFriends: 0,
     needsPhotoAndProfile: true,
     needsResponseRecord: false,
-    how: "An approved photo, a complete profile, and 3 conversations.",
+    how: "An approved photo (public or private), a complete profile, and 3 conversations.",
   },
   {
     tier: "trusted",
@@ -104,6 +104,7 @@ export type Progress = {
 
 // Plain-language definitions shown wherever the levels are explained.
 export const DEFINITIONS = {
+  photo: "any photo a person on our team has approved. It can be public or private, so you’re never held back for keeping your photos to yourself",
   completeProfile: "a headline, an “about you” of at least 40 characters, “what I’m looking for” of at least 20, your location and at least one relationship goal",
   conversation: "a chat where you and the other person have both written in the last 60 days. It counts once per person, and it doesn’t matter who started it",
   responseRecord: "if people write to you first, you answer at least half of them. This only matters once three people have written to you, so you’re never marked down for messages you didn’t get",

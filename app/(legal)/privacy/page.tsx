@@ -85,11 +85,14 @@ export default function PrivacyPage() {
       <h2>Who sees your data</h2>
       <ul>
         <li>
-          <strong>Other members</strong> see your profile and photos once photos are approved, and an “Age verified”
+          <strong>Other members</strong> see your profile and public photos once photos are approved, and an “Age verified”
           badge if you passed the age check. Your messages are visible only to you and the person you’re writing to.
         </li>
         <li>
-          <strong>Our moderators</strong> see photos before they’re approved, and may read the conversation attached to a
+          <strong>Members you share with</strong> see your private photos, only for as long as you share them. You choose who, and can stop at any time, though they may already have seen or saved them. We record who you share with so we can show you and apply your choice.
+        </li>
+        <li>
+          <strong>Our moderators</strong> see all photos, public and private, before they’re approved, and may read the conversation attached to a
           report when you or someone else reports it.
         </li>
         <li>

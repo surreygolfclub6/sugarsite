@@ -20,7 +20,7 @@ import {
 import { AgeBadge } from "@/components/age-badge";
 import { LevelBadge } from "@/components/level-badge";
 import type { TierKey } from "@/lib/levels";
-import { Gallery } from "./gallery";
+import { Gallery, type GalleryPhoto } from "./gallery";
 import { SafetyMenu } from "@/components/safety-menu";
 import { LikeFab, MessageBar } from "./profile-actions";
 
@@ -60,7 +60,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
 
   // Everything the page needs is independent of the profile row, so it's all fetched at once.
   // Row-level security hides inactive, suspended and blocked members, so they 404 like a bad link.
-  const [{ data: p }, { data: ageRows }, { data: rows }, { data: distance }, { data: iLiked }, { data: theyLiked }, { data: tierRows }] = await Promise.all([
+  const [{ data: p }, { data: ageRows }, { data: rows }, { data: distance }, { data: iLiked }, { data: theyLiked }, { data: tierRows }, { data: privateTotal }] = await Promise.all([
     supabase
       .from("profiles")
       .select(
@@ -69,11 +69,12 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
       .eq("id", id)
       .single(),
     supabase.rpc("member_ages", { ids: [id] }),
-    supabase.from("photos").select("storage_path").eq("user_id", id).eq("moderation", "approved").order("position"),
+    supabase.from("photos").select("storage_path, visibility").eq("user_id", id).eq("moderation", "approved").order("position"),
     supabase.rpc("distance_band", { target: id }),
     supabase.from("likes").select("to_user").eq("from_user", user.id).eq("to_user", id).maybeSingle(),
     supabase.from("likes").select("from_user").eq("from_user", id).eq("to_user", user.id).maybeSingle(),
     supabase.rpc("member_tiers", { ids: [id] }),
+    supabase.rpc("private_photo_count", { owner: id }),
   ]);
   const level = tierRows?.[0] as { tier: TierKey; label: string } | undefined;
   if (!p) notFound();
@@ -83,7 +84,16 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
   const { data: signed } = paths.length
     ? await createAdminClient().storage.from("photos").createSignedUrls(paths, 3600)
     : { data: [] };
-  const urls = paths.flatMap((path) => signed?.find((s) => s.path === path)?.signedUrl ?? []);
+  // Public photos first, then any private ones this member has shared with the viewer (row-level security already
+  // leaves out the rest). Whatever is still hidden is only counted, so the page can say so.
+  const galleryPhotos: GalleryPhoto[] = (rows ?? [])
+    .flatMap((r) => {
+      const url = signed?.find((s) => s.path === r.storage_path)?.signedUrl;
+      return url ? [{ url, private: r.visibility === "private" }] : [];
+    })
+    .sort((a, b) => Number(!!a.private) - Number(!!b.private));
+  const privateVisible = galleryPhotos.filter((g) => g.private).length;
+  const lockedPhotos = p.id === user.id ? 0 : Math.max(0, (privateTotal ?? 0) - privateVisible);
 
   const name = p.display_name ?? "Member";
   const own = p.id === user.id;
@@ -97,7 +107,15 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <article className="space-y-3 pb-20">
-      <Gallery name={name} urls={urls} menu={own ? undefined : <SafetyMenu profileId={p.id} name={name} />} />
+      <Gallery name={name} photos={galleryPhotos} locked={lockedPhotos} ownerView={own} menu={own ? undefined : <SafetyMenu profileId={p.id} name={name} />} />
+      {lockedPhotos > 0 && (
+        <p className="flex items-start gap-2 px-1 text-sm text-dusk">
+          <svg viewBox="0 0 24 24" className="mt-0.5 size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </svg>
+          <span>{name} has {lockedPhotos} private {lockedPhotos === 1 ? "photo" : "photos"}. Members choose who to share them with, usually once they’ve been in touch.</span>
+        </p>
+      )}
 
       <div className="px-1 pt-2">
         <h1 className="display text-4xl">{name}{age !== undefined && `, ${age}`}{p.age_verified && <> <AgeBadge className="inline size-6 align-middle" /></>}</h1>

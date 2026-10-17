@@ -90,7 +90,7 @@ export function parseFilters(sp: Search) {
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
 // Other members' photos live in a private bucket, so the server signs short-lived URLs for
-// approved photos only (their first one is the tile picture).
+// approved public photos only (their first one is the tile picture; private photos never appear on tiles).
 export async function firstPhotos(supabase: Supabase, ids: string[]) {
   const { data: photos } = ids.length
     ? await supabase
@@ -98,6 +98,7 @@ export async function firstPhotos(supabase: Supabase, ids: string[]) {
         .select("user_id, storage_path")
         .in("user_id", ids)
         .eq("moderation", "approved")
+        .eq("visibility", "public")
         .order("position")
     : { data: [] };
   const first = new Map<string, string>();

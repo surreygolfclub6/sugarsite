@@ -75,9 +75,9 @@ export function TileGrid({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={c.photo} alt={`${c.display_name}’s photo`} loading="lazy" className="size-full object-cover" />
               ) : (
-                <div role="img" aria-label="Photo coming soon" className="grid size-full place-items-center text-center text-xs text-dusk">
+                <div role="img" aria-label="No public photo" className="grid size-full place-items-center text-center text-xs text-dusk">
                   <span className="display text-6xl">{c.display_name.slice(0, 1)}</span>
-                  <span>Photo coming soon</span>
+                  <span>No public photo</span>
                 </div>
               )}
               {c.photo_count > 0 && (

@@ -21,14 +21,14 @@ async function OnboardingContent() {
 
   const { data: photoRows } = await supabase
     .from("photos")
-    .select("id, storage_path, moderation, rejection_reason")
+    .select("id, storage_path, moderation, rejection_reason, visibility")
     .eq("user_id", user.id)
     .order("position");
   const { data: signed } = await supabase.storage
     .from("photos")
     .createSignedUrls((photoRows ?? []).map((r) => r.storage_path), 3600);
   const initialPhotos = (photoRows ?? []).flatMap((r, i) =>
-    signed?.[i]?.signedUrl ? [{ id: r.id, path: r.storage_path, url: signed[i].signedUrl, moderation: r.moderation, reason: r.rejection_reason }] : [],
+    signed?.[i]?.signedUrl ? [{ id: r.id, path: r.storage_path, url: signed[i].signedUrl, moderation: r.moderation, reason: r.rejection_reason, visibility: r.visibility }] : [],
   );
 
   const cutoff = new Date();

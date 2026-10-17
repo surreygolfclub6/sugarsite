@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AgeBadge } from "@/components/age-badge";
 import { SafetyMenu } from "@/components/safety-menu";
+import { SharePhotosButton } from "@/components/share-photos-button";
 import { createClient, realtimeReady } from "@/lib/supabase/client";
 import { loadEarlier, loadSince, markRead, sendMessage, type Message } from "../actions";
 
@@ -34,12 +35,14 @@ export function Thread({
   conversationId,
   meId,
   other,
+  sharing,
   initial,
   hasEarlier: initialHasEarlier,
 }: {
   conversationId: string;
   meId: string;
   other: Other;
+  sharing: { canShare: boolean; shared: boolean };
   initial: Message[];
   hasEarlier: boolean;
 }) {
@@ -182,7 +185,8 @@ export function Thread({
               {other.online && <span className="block text-xs text-emerald-400">Online now</span>}
             </span>
           </Link>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <SharePhotosButton meId={meId} otherId={other.id} name={other.name} canShare={sharing.canShare} shared={sharing.shared} />
             <SafetyMenu profileId={other.id} name={other.name} conversationId={conversationId} />
           </div>
         </div>

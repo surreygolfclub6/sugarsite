@@ -31,6 +31,7 @@ export default function SafetyPage() {
         <li>Take your time. Chat on {SITE_NAME} for a while before sharing your number or social media.</li>
         <li>Be careful with personal details such as your home or work address, financial information and your full name.</li>
         <li>Check that their photos and what they say add up. A video call before you meet can help.</li>
+        <li>Only share private photos with people you trust. Anyone who can see a photo could save or screenshot it, and you can’t take that back.</li>
       </ul>
 
       <h2>When you meet</h2>

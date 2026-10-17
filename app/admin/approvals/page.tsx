@@ -25,7 +25,7 @@ async function Approvals() {
   const [{ data: checks }, { data: photos }] = ids.length
     ? await Promise.all([
         admin.from("age_checks").select("user_id, assurance_level, age_threshold, country, verified_at").in("user_id", ids),
-        admin.from("photos").select("id, user_id, storage_path, moderation").in("user_id", ids).order("position"),
+        admin.from("photos").select("id, user_id, storage_path, moderation, visibility").in("user_id", ids).order("position"),
       ])
     : [{ data: [] }, { data: [] }];
   // Moderators can see who invited each waiting member. Members only ever see counts.
@@ -79,9 +79,10 @@ async function Approvals() {
 
               <ul className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {mine.map((p) => (
-                  <li key={p.id}>
+                  <li key={p.id} className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={urlFor(p.storage_path)} alt={`${m.display_name}’s photo (${p.moderation})`} className="aspect-[3/4] w-full rounded-xl border border-line object-cover" />
+                    <img src={urlFor(p.storage_path)} alt={`${m.display_name}’s ${p.visibility} photo (${p.moderation})`} className="aspect-[3/4] w-full rounded-xl border border-line object-cover" />
+                    <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">{p.visibility === "private" ? "Private" : "Public"}</span>
                   </li>
                 ))}
                 {mine.length === 0 && <li className="text-sm text-dusk">No photos.</li>}

@@ -42,11 +42,17 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
     .limit(PAGE + 1);
   const rows = latest ?? [];
   const photo = (await firstPhotos(supabase, [otherId])).get(otherId)?.url ?? null;
+  // Whether you have private photos to share, and whether you already share them with this person.
+  const [{ count: privateCount }, { data: share }] = await Promise.all([
+    supabase.from("photos").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("visibility", "private"),
+    supabase.from("photo_shares").select("viewer_id").eq("owner_id", user.id).eq("viewer_id", otherId).maybeSingle(),
+  ]);
 
   return (
     <Thread
       conversationId={id}
       meId={user.id}
+      sharing={{ canShare: (privateCount ?? 0) > 0, shared: Boolean(share) }}
       other={{ id: other.id, name: other.display_name ?? "Member", photo, online: isOnline(other.last_active_at), verified: other.age_verified }}
       initial={rows.slice(0, PAGE).reverse()}
       hasEarlier={rows.length > PAGE}

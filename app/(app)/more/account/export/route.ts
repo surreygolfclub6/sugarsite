@@ -11,10 +11,11 @@ export async function GET() {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
-  const [profile, photos, likesSent, likesReceived, blocks, conversations] = await Promise.all([
+  const [profile, photos, photoShares, likesSent, likesReceived, blocks, conversations] = await Promise.all([
     // Birthdate and consent records aren't readable by members through the API, so read your own row server-side.
     createAdminClient().from("profiles").select("*").eq("id", user.id).single(),
-    supabase.from("photos").select("id, storage_path, position, moderation, rejection_reason, created_at").eq("user_id", user.id).order("position"),
+    supabase.from("photos").select("id, storage_path, position, moderation, rejection_reason, visibility, created_at").eq("user_id", user.id).order("position"),
+    supabase.from("photo_shares").select("viewer_id, created_at").eq("owner_id", user.id),
     supabase.from("likes").select("to_user, created_at").eq("from_user", user.id),
     supabase.from("likes").select("from_user, created_at").eq("to_user", user.id),
     supabase.from("blocks").select("blocked, blocked_name, created_at").eq("blocker", user.id),
@@ -42,6 +43,7 @@ export async function GET() {
     account: { id: user.id, email: user.email, created_at: user.created_at },
     profile: profile.data,
     photos: photos.data ?? [],
+    private_photos_shared_with: photoShares.data ?? [],
     likes_sent: likesSent.data ?? [],
     likes_received: likesReceived.data ?? [],
     blocked: blocks.data ?? [],

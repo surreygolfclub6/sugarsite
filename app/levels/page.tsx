@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const steps = [
-  { title: "Add a photo", body: "Upload a clear photo of you. Once a person on our team has approved it, it counts." },
+  { title: "Add a photo", body: "Upload a clear photo of you. Once a person on our team has approved it, it counts, whether it’s public or private." },
   { title: "Complete your profile", body: `A complete profile has ${DEFINITIONS.completeProfile}.` },
   { title: "Start and keep conversations going", body: `A conversation is ${DEFINITIONS.conversation}. You don’t need to wait for messages: start conversations yourself and they count once the other person writes back.` },
   { title: "Invite friends who’d like to be here", body: `A friend counts once they’re a real member: ${DEFINITIONS.realMember}. You see how many, never who.` },
@@ -22,6 +22,7 @@ const faqs = [
   { q: "What if nobody messages me?", a: "You don’t need to receive messages to move up. Conversations count whoever starts them, as soon as both of you have written. Start a few each day (you get more in your first week), like people you’d like to meet, and invite a friend." },
   { q: "What’s the response record?", a: `It only applies to Trusted and Champion. ${DEFINITIONS.responseRecord.charAt(0).toUpperCase() + DEFINITIONS.responseRecord.slice(1)}.` },
   { q: "Why are the limits lower when you start?", a: "It keeps conversations genuine. Members who add a photo, fill in their profile and have real conversations make the community better for everyone, so they get more room." },
+  { q: "Do I have to show a photo publicly?", a: "No. A private photo counts towards your level just like a public one. Private photos aren’t shown on your profile or in search; you choose which members can see them. Our team still reviews every photo before it’s approved." },
   { q: "What happens in my first week?", a: "Your first week after you go live counts as Member, so nobody is held back while they set up." },
   { q: "Can I go down a level?", a: "Yes, if the things that earned your level stop being true, for example if you stop having conversations for a long time. An upheld report about you holds you at Member for 90 days." },
   { q: "Do I have to pay?", a: "No. Everything on this page is earned, not bought. We may add paid options later, and we’ll tell members first. The levels you’ve earned will still count." },
