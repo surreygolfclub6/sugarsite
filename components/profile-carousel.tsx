@@ -1,47 +1,53 @@
 "use client";
 
-import { useRef } from "react";
+import { Children, useRef, useState } from "react";
 
-// A row of cards that sits in a five-column grid from 1280px up and scrolls sideways (with snapping) on narrower ones.
-// The arrow buttons are for mouse users on tablet widths; phones swipe.
+// The hero's example profiles. On wide screens they sit side by side (two across from 1024px, three from 1280px).
+// Below that they keep the size of a single card and scroll sideways with snapping, with the next card peeking in
+// and a dot for each profile.
 export function ProfileCarousel({ children, label }: { children: React.ReactNode; label: string }) {
   const list = useRef<HTMLUListElement>(null);
+  const [active, setActive] = useState(0);
+  const count = Children.count(children);
 
-  function scroll(direction: 1 | -1) {
+  function onScroll() {
     const el = list.current;
-    if (!el) return;
-    const card = el.querySelector("li");
-    const step = (card?.getBoundingClientRect().width ?? 260) + 16;
-    el.scrollBy({ left: direction * step, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    const first = el?.children[0] as HTMLElement | undefined;
+    if (!el || !first) return;
+    const step = first.getBoundingClientRect().width + 16;
+    setActive(Math.min(count - 1, Math.max(0, Math.round(el.scrollLeft / step))));
   }
 
-  const arrow =
-    "grid size-10 place-items-center rounded-full border border-line bg-velvet text-pearl hover:border-dusk";
+  function goTo(index: number) {
+    const el = list.current;
+    const card = el?.children[index] as HTMLElement | undefined;
+    if (!el || !card) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ left: card.offsetLeft - el.offsetLeft - parseFloat(getComputedStyle(el).paddingLeft), behavior: reduce ? "auto" : "smooth" });
+  }
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-4 xl:hidden">
-        <p className="text-sm text-dusk">Swipe to see more</p>
-        <div className="flex gap-2">
-          <button type="button" aria-label="Previous profile" onClick={() => scroll(-1)} className={arrow}>
-            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
-          <button type="button" aria-label="Next profile" onClick={() => scroll(1)} className={arrow}>
-            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
       <ul
         ref={list}
         aria-label={label}
-        className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:scroll-px-8 sm:px-8 xl:mx-0 xl:grid xl:grid-cols-5 xl:gap-5 xl:overflow-visible xl:px-0 xl:pb-0"
+        onScroll={onScroll}
+        className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-1 sm:-mx-8 sm:scroll-px-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0 lg:pb-0 xl:grid-cols-3"
       >
         {children}
       </ul>
+      <div className="mt-4 flex justify-center gap-2 lg:hidden">
+        {Array.from({ length: count }, (_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Show profile ${i + 1} of ${count}`}
+            aria-current={i === active}
+            onClick={() => goTo(i)}
+            className={`h-2 rounded-full transition-all ${i === active ? "w-5 bg-garnet" : "w-2 bg-dusk/40"}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

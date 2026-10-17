@@ -4,10 +4,34 @@
 
 /*
   Design tokens
-  Claret night base, pearl text, garnet for actions, brass reserved for
-  "verified" and fine detail so it keeps its meaning.
+  Light is the default: white and soft grey with plum text, garnet for actions, brass reserved for
+  "verified" and fine detail so it keeps its meaning. The dark theme (claret night, pearl text) is
+  chosen under More, Appearance; the inline script in the root layout sets data-theme before first paint.
 */
 :root {
+  --night: #ffffff;
+  --velvet: #f6f4f3;
+  --velvet-2: #ece8e6;
+  --line: #e3dedc;
+  --line-strong: #6a5f66;
+  --pearl: #231a21;
+  --dusk: #6a5f66;
+  --garnet: #b8405e;
+  --garnet-deep: #8f2f48;
+  --brass: #8a6420;
+  --danger: #b3283d;
+  --on-accent: #ffffff;
+  /* Input borders and the slider track need to be visible against white (3:1 for borders). */
+  --field: #ffffff;
+  --field-focus: #ffffff;
+  --field-border: #948b91;
+  --track: #a9a1a6;
+  --thumb: #ffffff;
+  --thumb-shadow: 0 1px 3px rgba(35, 26, 33, 0.35);
+}
+
+/* Dark theme: the original claret night palette. */
+:root[data-theme="dark"] {
   --night: #160f18;
   --velvet: #20161f;
   --velvet-2: #2b1e2a;
@@ -30,29 +54,7 @@
   --thumb-shadow: none;
 }
 
-/* Light theme. Chosen under More, Appearance; the inline script in the root layout sets data-theme before
-   first paint so there is no flash. The same tokens, white and soft grey instead of claret night. */
-:root[data-theme="light"] {
-  --night: #ffffff;
-  --velvet: #f6f4f3;
-  --velvet-2: #ece8e6;
-  --line: #e3dedc;
-  --line-strong: #6a5f66;
-  --pearl: #231a21;
-  --dusk: #6a5f66;
-  --garnet: #b8405e;
-  --garnet-deep: #8f2f48;
-  --brass: #8a6420;
-  --danger: #b3283d;
-  --on-accent: #ffffff;
-  /* Input borders and the slider track need to be visible against white (3:1 for borders). */
-  --field: #ffffff;
-  --field-focus: #ffffff;
-  --field-border: #948b91;
-  --track: #a9a1a6;
-  --thumb: #ffffff;
-  --thumb-shadow: 0 1px 3px rgba(35, 26, 33, 0.35);
-}
+
 
 @theme inline {
   --color-night: var(--night);
@@ -71,10 +73,10 @@
 
 html {
   background: var(--night);
-  color-scheme: dark;
-}
-html[data-theme="light"] {
   color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {

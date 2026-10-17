@@ -30,9 +30,20 @@ function Cross() {
   );
 }
 
-// Examples of how members describe themselves. Invented, and labelled as examples on the page. Drop a photo
-// named after the slug into public/images/home (for example profile-marcus.jpg) and it replaces the gradient.
+// Examples of how members describe themselves. Invented, and labelled as examples on the page. Elena uses
+// hero.jpg; for the others, drop a photo named profile-<slug>.jpg into public/images/home and it replaces the gradient.
 const exampleProfiles = [
+  {
+    slug: "elena",
+    image: "hero.jpg",
+    alt: "A woman seated at a restaurant table as her date arrives",
+    name: "Elena",
+    age: 29,
+    city: "London",
+    headline: "Between projects and travelling a lot. I like good dinners and someone who’s easy to talk to.",
+    looking: "A relationship with clear expectations, discretion on both sides, and time together that suits two busy diaries.",
+    goals: ["Long-term", "Casual dating"],
+  },
   {
     slug: "marcus",
     name: "Marcus",
@@ -69,16 +80,57 @@ const exampleProfiles = [
     looking: "Someone established and kind who knows what they want, and says so. I’d rather be direct than guess.",
     goals: ["Casual dating", "Marriage minded"],
   },
-  {
-    slug: "daniel",
-    name: "Daniel",
-    age: 46,
-    city: "London",
-    headline: "Restaurateur. Tasting menu or takeaway, I’m not fussy.",
-    looking: "A relationship with room for both our lives: generous with time, discreet, and fun to be around.",
-    goals: ["Long-term", "No strings attached"],
-  },
 ];
+
+function ExampleCard({ p, index }: { p: (typeof exampleProfiles)[number]; index: number }) {
+  return (
+    <li
+      className={`flex w-[calc(100%-2.25rem)] max-w-sm shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-line bg-velvet shadow-[0_30px_80px_-40px_rgba(0,0,0,0.55)] sm:w-80 lg:w-auto lg:max-w-none ${
+        // Everyone scrolls on small screens; two show side by side from 1024px and three from 1280px.
+        index === 2 ? "lg:hidden xl:flex" : index > 2 ? "lg:hidden" : ""
+      }`}
+    >
+      <div className="relative">
+        <HomeImage
+          name={"image" in p && p.image ? p.image : `profile-${p.slug}.jpg`}
+          alt={"alt" in p && p.alt ? p.alt : `${p.name}, an example member`}
+          sizes="(min-width: 1280px) 260px, (min-width: 1024px) 340px, 90vw"
+          priority={index === 0}
+          tone={index}
+          initial={p.name.slice(0, 1)}
+          className="aspect-[4/4.2]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to top, rgba(22,15,24,0.92) 0%, rgba(22,15,24,0) 55%)" }}
+        />
+        <div className="absolute bottom-4 left-5 right-5 text-white">
+          <p className="display flex items-center gap-2 text-3xl">
+            {p.name}, {p.age} <AgeBadge className="size-5" />
+          </p>
+          <p className="text-sm text-white/75">{p.city}</p>
+        </div>
+        <span className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white/85 backdrop-blur">
+          Example profile
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col gap-4 p-5">
+        <p className="serif-body italic text-pearl/90">“{p.headline}”</p>
+        <div className="mt-auto border-t border-line pt-4">
+          <p className="text-sm font-semibold text-brass">What I’m looking for</p>
+          <p className="mt-1 text-sm text-dusk">{p.looking}</p>
+          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Relationship goals">
+            {p.goals.map((g) => (
+              <li key={g} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-dusk">
+                {g}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </li>
+  );
+}
 
 const steps = [
   {
@@ -185,12 +237,12 @@ export default function Home() {
 
       <main>
         {/* Hero */}
-        <section className="mx-auto grid w-full max-w-6xl gap-14 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:pt-20">
+        <section className="mx-auto grid w-full max-w-7xl gap-12 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[0.8fr_1.4fr] lg:items-center lg:gap-14 lg:pt-20">
           <div>
             <p className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-brass">
               Dating, on clear terms
             </p>
-            <h1 className="display text-[clamp(2.9rem,8vw,6.2rem)]">
+            <h1 className="display text-[clamp(2.9rem,8vw,6.2rem)] lg:text-[clamp(3rem,4.6vw,5.4rem)]">
               Say what you’re looking for.
             </h1>
             <p className="serif-body mt-7 max-w-[36ch] text-xl text-dusk sm:text-2xl">
@@ -208,106 +260,11 @@ export default function Home() {
             <p className="mt-5 text-sm text-dusk">18 and over only.</p>
           </div>
 
-          {/* A sample profile: shows the product's one idea, a profile that states its terms. */}
-          <div className="rise mx-auto w-full max-w-sm lg:mx-0 lg:justify-self-end" aria-label="Example profile">
-            <div className="overflow-hidden rounded-[22px] border border-line bg-velvet shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
-              <div className="relative">
-                <HomeImage
-                  name="hero.jpg"
-                  alt="A woman seated at a restaurant table as her date arrives"
-                  sizes="(min-width: 1024px) 384px, 90vw"
-                  priority
-                  className="aspect-[4/4.2]"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(to top, rgba(22,15,24,0.92) 0%, rgba(22,15,24,0) 55%)",
-                  }}
-                />
-                <div className="absolute bottom-4 left-5 right-5 text-white">
-                  <p className="display flex items-center gap-2 text-3xl">
-                    Elena, 29 <Check />
-                  </p>
-                  <p className="text-sm text-white/75">London</p>
-                </div>
-                <span className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white/85 backdrop-blur">
-                  Example profile
-                </span>
-              </div>
-              <div className="space-y-4 p-5">
-                <p className="serif-body italic text-pearl/90">
-                  “Between projects and travelling a lot. I like good dinners and someone who’s
-                  easy to talk to.”
-                </p>
-                <div className="border-t border-line pt-4">
-                  <p className="text-sm font-semibold text-brass">What I’m looking for</p>
-                  <p className="mt-1 text-sm text-dusk">
-                    A relationship with clear expectations, discretion on both sides, and time
-                    together that suits two busy diaries.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Example profiles */}
-        <section id="profiles" className="border-t border-line">
-          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
-            <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <h2 className="display max-w-[22ch] text-[clamp(2rem,5vw,3.4rem)]">Profiles that say what they want.</h2>
-              <p className="max-w-[40ch] text-dusk">
-                A few examples of how members describe themselves. Every profile has a space for what they’re looking for,
-                in their own words.
-              </p>
-            </div>
-
+          {/* Sample profiles: show the product's one idea, a profile that states its terms. */}
+          <div className="rise min-w-0">
             <ProfileCarousel label="Example profiles">
               {exampleProfiles.map((p, i) => (
-                <li
-                  key={p.slug}
-                  className="flex w-[74%] min-w-[15.5rem] max-w-[18rem] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-line bg-velvet xl:w-auto xl:min-w-0 xl:max-w-none"
-                >
-                  <div className="relative">
-                    <HomeImage
-                      name={`profile-${p.slug}.jpg`}
-                      alt={`${p.name}, an example member`}
-                      sizes="(min-width: 1280px) 230px, 280px"
-                      tone={i + 1}
-                      initial={p.name.slice(0, 1)}
-                      className="aspect-[4/4.6]"
-                    />
-                    <div
-                      className="absolute inset-0"
-                      style={{ background: "linear-gradient(to top, rgba(22,15,24,0.9) 0%, rgba(22,15,24,0) 55%)" }}
-                    />
-                    <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-0.5 text-[11px] text-white/85 backdrop-blur">
-                      Example profile
-                    </span>
-                    <div className="absolute inset-x-4 bottom-3 text-white">
-                      <p className="display flex items-center gap-1.5 text-2xl">
-                        {p.name}, {p.age} <AgeBadge className="size-4" />
-                      </p>
-                      <p className="text-xs text-white/75">{p.city}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-1 flex-col gap-3 p-4">
-                    <p className="serif-body text-sm italic leading-relaxed text-pearl/90">“{p.headline}”</p>
-                    <div className="mt-auto border-t border-line pt-3">
-                      <p className="text-xs font-semibold text-brass">What I’m looking for</p>
-                      <p className="mt-1 text-sm text-dusk">{p.looking}</p>
-                      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Relationship goals">
-                        {p.goals.map((g) => (
-                          <li key={g} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-dusk">
-                            {g}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </li>
+                <ExampleCard key={p.slug} p={p} index={i} />
               ))}
             </ProfileCarousel>
           </div>

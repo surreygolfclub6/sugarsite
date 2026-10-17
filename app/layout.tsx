@@ -12,10 +12,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
-        {/* Applies the saved theme before first paint. Dark is the default. */}
+        {/* Applies the saved theme before first paint. Light is the default. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("theme");if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.dataset.theme="light"}catch(e){}`,
+            __html: `try{var t=localStorage.getItem("theme");var d=t==="dark"||(t==="system"&&!matchMedia("(prefers-color-scheme: light)").matches);document.documentElement.dataset.theme=d?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}`,
           }}
         />
       </head>

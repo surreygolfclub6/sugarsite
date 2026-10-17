@@ -5,8 +5,8 @@ import { useSyncExternalStore } from "react";
 type Pref = "dark" | "light" | "system";
 
 const OPTIONS: { value: Pref; label: string }[] = [
-  { value: "dark", label: "Dark" },
   { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
   { value: "system", label: "Match my device" },
 ];
 
@@ -25,15 +25,15 @@ const subscribe = (cb: () => void) => {
 function readPref(): Pref {
   try {
     const stored = localStorage.getItem("theme");
-    return stored === "light" || stored === "system" ? stored : "dark";
+    return stored === "dark" || stored === "system" ? stored : "light";
   } catch {
-    return "dark";
+    return "light";
   }
 }
 
 function apply(pref: Pref) {
-  const light = pref === "light" || (pref === "system" && window.matchMedia("(prefers-color-scheme: light)").matches);
-  document.documentElement.dataset.theme = light ? "light" : "dark";
+  const dark = pref === "dark" || (pref === "system" && !window.matchMedia("(prefers-color-scheme: light)").matches);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
 }
 
 // Follows the device while "Match my device" is chosen, including when the device switches at sunset.
@@ -44,7 +44,7 @@ if (typeof window !== "undefined") {
 }
 
 export function ThemeSetting() {
-  const pref = useSyncExternalStore(subscribe, readPref, () => "dark" as Pref);
+  const pref = useSyncExternalStore(subscribe, readPref, () => "light" as Pref);
 
   function choose(next: Pref) {
     try {
