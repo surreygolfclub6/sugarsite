@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";
 import { ThemeSetting } from "@/components/theme-setting";
+import { COMPANY } from "@/lib/config";
 
 export const metadata: Metadata = { title: "More" };
 
@@ -38,6 +39,15 @@ async function More() {
           </form>
         </li>
       </ul>
+
+      <footer className="mt-10 border-t border-line px-1 pt-6 text-sm text-dusk">
+        <nav aria-label="Legal and contact" className="flex flex-wrap gap-x-5 gap-y-2">
+          <Link href="/terms" className="hover:text-pearl">Terms</Link>
+          <Link href="/privacy" className="hover:text-pearl">Privacy</Link>
+          <Link href="/safety" className="hover:text-pearl">Safety</Link>
+          <a href={`mailto:${COMPANY.email}`} className="hover:text-pearl">Contact</a>
+        </nav>
+      </footer>
     </>
   );
 }
