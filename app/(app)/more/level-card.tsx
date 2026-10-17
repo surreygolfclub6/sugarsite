@@ -209,8 +209,9 @@ export async function LevelCard({ userId }: { userId: string }) {
         <div className="border-t border-line p-5 pt-4">
           <p className="text-sm text-dusk">
             This is your personal link. When a friend joins through it, passes
-            the age check, completes their profile and has been a member for a
-            week, they count towards your next level. You’ll see how many, never
+            the age check, is approved and completes their profile, they count
+            towards your next level straight away. They stop counting if they
+            leave or go 30 days without being active. You’ll see how many, never
             who.
           </p>
           <div className="mt-4">

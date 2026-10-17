@@ -114,5 +114,5 @@ export const DEFINITIONS = {
   conversation: "a chat where you and the other person have both written in the last 60 days, or a match. It counts once per person, and it doesn’t matter who started it",
   responseRecord: "if people write to you first, you answer at least half of them. This only matters once three people have written to you, so you’re never marked down for messages you didn’t get",
   match: "two members who have both liked each other. Messaging a match never uses up your daily new conversations",
-  realMember: "someone you invited with your link who has passed the age check, been approved, added a photo, completed their profile and stayed live for 3 days",
+  realMember: "someone you invited with your link who has passed the age check, been approved, added a photo, completed their profile. They count straight away, and stop counting if they leave, are suspended or haven’t been active for 30 days",
 };
