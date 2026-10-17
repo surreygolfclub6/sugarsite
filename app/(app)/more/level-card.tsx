@@ -58,7 +58,7 @@ export async function LevelCard({ userId }: { userId: string }) {
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuemin={0} aria-valuemax={pr.daily_conversations} aria-valuenow={used} aria-label="New conversations used today">
             <div className="h-full rounded-full bg-garnet" style={{ width: `${(used / pr.daily_conversations) * 100}%` }} />
           </div>
-          <p className="mt-2 text-xs text-dusk">Replying to people who message you is always unlimited.</p>
+          <p className="mt-2 text-xs text-dusk">Replying to people who message you, and messaging a match, never uses these up.</p>
         </div>
 
         {pr.in_grace && (
@@ -76,12 +76,13 @@ export async function LevelCard({ userId }: { userId: string }) {
           <div className="mt-6 border-t border-line pt-5">
             <p className="text-sm font-semibold">Next: {next.label}</p>
             <p className="mt-1 text-xs text-dusk">
-              {next.daily_conversations} new conversations a day and {next.likes_per_hour} likes an hour.
+              You’d get {next.daily_conversations} new conversations a day and a {next.label} badge.
             </p>
             <ul className="mt-4 space-y-3">
               {next.needs_photo && <Step done={m.has_photo}>Get a photo approved (<Link href="/photos" className="underline underline-offset-2">add or replace photos</Link>)</Step>}
               {next.needs_profile && <Step done={m.profile_ok}>Complete your profile (<Link href="/more/profile" className="underline underline-offset-2">edit profile</Link>)</Step>}
-              {next.min_replies > 0 && <Step done={m.replies >= next.min_replies}>Reply to {next.min_replies} people ({Math.min(m.replies, next.min_replies)} so far)</Step>}
+              {next.min_conversations > 0 && <Step done={m.conversations >= next.min_conversations}>Have {next.min_conversations} conversations, where you’ve both written ({Math.min(m.conversations, next.min_conversations)} so far)</Step>}
+              {next.needs_responsive && <Step done={m.responsive}>Keep a good response record: answer at least half of the people who write to you first</Step>}
               {next.min_referrals > 0 && <Step done={m.referrals_qualified >= next.min_referrals}>Invite {next.min_referrals} {next.min_referrals === 1 ? "friend" : "friends"} who become real members ({Math.min(m.referrals_qualified, next.min_referrals)} so far)</Step>}
             </ul>
           </div>
@@ -89,7 +90,7 @@ export async function LevelCard({ userId }: { userId: string }) {
           <p className="mt-6 border-t border-line pt-5 text-sm text-dusk">You’ve reached the top level. Thank you for helping SugarMatch thrive.</p>
         )}
         <p className="mt-5 text-sm">
-          <Link href="/levels" className="text-brass underline underline-offset-2">How levels work</Link>
+          <Link href="/more/levels" className="text-brass underline underline-offset-2">See all levels and what they unlock</Link>
         </p>
       </div>
 

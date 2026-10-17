@@ -176,6 +176,11 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
         <section aria-label="Between you" className={`${card} space-y-2`}>
           <div className="flex justify-between"><span>You liked {name}</span><span className="text-dusk">{iLiked ? "Yes" : "Not yet"}</span></div>
           <div className="flex justify-between"><span>{name} liked you</span><span className="text-dusk">{theyLiked ? "Yes" : "Not yet"}</span></div>
+          {iLiked && theyLiked && (
+            <p className="rounded-xl border border-brass px-3 py-2 text-sm">
+              <span className="font-semibold text-brass">You’re a match.</span> Messaging a match never uses up your daily new conversations.
+            </p>
+          )}
         </section>
       )}
 

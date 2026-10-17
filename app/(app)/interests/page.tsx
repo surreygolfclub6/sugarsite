@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Interests" };
 async function Interests({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   await connection();
   const { tab: raw } = await searchParams;
-  const tab = raw === "liked" ? "liked" : "received";
+  const tab = raw === "liked" ? "liked" : raw === "matches" ? "matches" : "received";
 
   const supabase = await createClient();
   const {
@@ -25,13 +25,19 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
   after(() => touchActive(user.id));
 
   // The likes table only lets you see likes you sent or received.
+  // "Matches" are the people you liked who also liked you.
   const { data: likes } = await supabase
     .from("likes")
     .select("from_user, to_user")
-    .eq(tab === "liked" ? "from_user" : "to_user", user.id)
+    .eq(tab === "received" ? "to_user" : "from_user", user.id)
     .order("created_at", { ascending: false })
-    .limit(48);
-  const ids = (likes ?? []).map((l) => (tab === "liked" ? l.to_user : l.from_user));
+    .limit(tab === "matches" ? 200 : 48);
+  let ids = (likes ?? []).map((l) => (tab === "received" ? l.from_user : l.to_user));
+  if (tab === "matches" && ids.length) {
+    const { data: back } = await supabase.from("likes").select("from_user").eq("to_user", user.id).in("from_user", ids);
+    const mutual = new Set((back ?? []).map((l) => l.from_user));
+    ids = ids.filter((id) => mutual.has(id)).slice(0, 48);
+  }
 
   const { data: mine } = ids.length
     ? await supabase.from("likes").select("to_user").eq("from_user", user.id).in("to_user", ids)
@@ -67,6 +73,7 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
   });
 
   const tabs = [
+    { key: "matches", label: "Matches" },
     { key: "received", label: "Liked you" },
     { key: "liked", label: "You liked" },
   ] as const;
@@ -89,9 +96,11 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
 
       {cards.length === 0 ? (
         <p className="mt-10 text-dusk">
-          {tab === "received"
-            ? "No one has liked you yet. Keep your photos up to date and check back soon."
-            : "You haven’t liked anyone yet. Find people on the Search tab."}
+          {tab === "matches"
+            ? "No matches yet. When you and another member like each other, they appear here, and messaging a match never uses up your daily conversations."
+            : tab === "received"
+              ? "No one has liked you yet. Keep your photos up to date and check back soon."
+              : "You haven’t liked anyone yet. Find people on the Search tab."}
         </p>
       ) : (
         <TileGrid key={tab} initialCards={cards} initialHasNext={false} query="" />

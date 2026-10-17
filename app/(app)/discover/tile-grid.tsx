@@ -20,6 +20,7 @@ export function TileGrid({
   const [hasNext, setHasNext] = useState(initialHasNext);
   const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
+  const [match, setMatch] = useState<{ id: string; name: string } | null>(null);
   const page = useRef(1);
   const busy = useRef(false);
   const sentinel = useRef<HTMLDivElement>(null);
@@ -55,7 +56,13 @@ export function TileGrid({
     const data = new FormData();
     data.set("profile_id", card.id);
     data.set("liked", String(card.liked));
-    startTransition(() => toggleLike(data));
+    startTransition(async () => {
+      const { matched } = await toggleLike(data);
+      if (matched) {
+        setMatch({ id: card.id, name: card.display_name });
+        window.setTimeout(() => setMatch(null), 8000);
+      }
+    });
   }
 
   return (
@@ -109,6 +116,13 @@ export function TileGrid({
           </li>
         ))}
       </ul>
+
+      {match && (
+        <div role="status" className="fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-sm items-center justify-between gap-3 rounded-2xl border border-brass bg-velvet px-4 py-3 shadow-lg">
+          <p className="text-sm"><span className="font-semibold text-brass">It’s a match</span> with {match.name}. Messaging a match never uses up your daily conversations.</p>
+          <Link href={`/profile/${match.id}`} className="btn btn-primary !px-4 !py-2 text-sm shrink-0">Say hello</Link>
+        </div>
+      )}
 
       <div ref={sentinel} className="py-10 text-center text-sm text-dusk" aria-live="polite">
         {hasNext ? (loading ? "Loading more…" : "") : <span data-end>That’s everyone for now.</span>}

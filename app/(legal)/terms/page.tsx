@@ -50,13 +50,13 @@ export default function TermsPage() {
       <h2>Levels and limits</h2>
       <ul>
         <li>
-          To keep {SITE_NAME} genuine, how many new conversations you can start, and how many people you can like each
-          hour, depends on your level: Newcomer, Member, Trusted or Champion. Replying to someone who has messaged you is
-          never limited.
+          To keep {SITE_NAME} genuine, how many new conversations you can start each day depends on your level: Newcomer,
+          Member, Trusted or Champion. Replying to someone who has messaged you is never limited, and neither is messaging a
+          match, which is when you and another member have both liked each other.
         </li>
         <li>
-          Your level rises as you add a photo, complete your profile, reply to people and invite friends who become real
-          members, and it can fall if those things stop being true. An upheld report about you holds your level at Member for
+          Your level rises as you add a photo, complete your profile, have conversations (chats where you have both written)
+          and invite friends who become real members, and it can fall if those things stop being true. An upheld report about you holds your level at Member for
           90 days. See <Link href="/levels">How levels work</Link>.
         </li>
         <li>

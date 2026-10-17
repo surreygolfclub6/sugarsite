@@ -9,10 +9,10 @@ export type Level = {
   label: string;
   tagline: string;
   conversationsPerDay: number;
-  likesPerHour: number;
-  minReplies: number;
+  minConversations: number;
   minFriends: number;
   needsPhotoAndProfile: boolean;
+  needsResponseRecord: boolean;
   how: string;
 };
 
@@ -22,46 +22,55 @@ export const LEVELS: Level[] = [
     label: "Newcomer",
     tagline: "Everyone starts here.",
     conversationsPerDay: 2,
-    likesPerHour: 30,
-    minReplies: 0,
+    minConversations: 0,
     minFriends: 0,
     needsPhotoAndProfile: false,
+    needsResponseRecord: false,
     how: "Join, pass the age check and get approved. Your first week counts as Member, so you can settle in.",
   },
   {
     tier: "member",
     label: "Member",
-    tagline: "A real profile and a real conversation.",
+    tagline: "A real profile and real conversations.",
     conversationsPerDay: 5,
-    likesPerHour: 80,
-    minReplies: 3,
+    minConversations: 3,
     minFriends: 0,
     needsPhotoAndProfile: true,
-    how: "An approved photo, a complete profile, and replies to 3 people.",
+    needsResponseRecord: false,
+    how: "An approved photo, a complete profile, and 3 conversations.",
   },
   {
     tier: "trusted",
     label: "Trusted",
     tagline: "People who make the community better.",
     conversationsPerDay: 12,
-    likesPerHour: 120,
-    minReplies: 10,
+    minConversations: 10,
     minFriends: 1,
     needsPhotoAndProfile: true,
-    how: "Everything in Member, replies to 10 people, and 1 invited friend who has become a real member.",
+    needsResponseRecord: true,
+    how: "Everything in Member, 10 conversations, 1 invited friend who has become a real member, and a good response record.",
   },
   {
     tier: "champion",
     label: "Champion",
     tagline: "The people who keep SugarMatch thriving.",
     conversationsPerDay: 25,
-    likesPerHour: 160,
-    minReplies: 25,
+    minConversations: 25,
     minFriends: 3,
     needsPhotoAndProfile: true,
-    how: "Everything in Trusted, replies to 25 people, and 3 invited friends who have become real members.",
+    needsResponseRecord: true,
+    how: "Everything in Trusted, 25 conversations, and 3 invited friends who have become real members.",
   },
 ];
+
+// What every level gets, in plain words. The same lines appear wherever levels are explained.
+export function whatYouGet(level: Level): string[] {
+  return [
+    `${level.conversationsPerDay} new conversations a day`,
+    "Replying and messaging a match: always unlimited",
+    `A ${level.label} badge on your profile`,
+  ];
+}
 
 // What the database returns from my_progress().
 export type Progress = {
@@ -69,19 +78,26 @@ export type Progress = {
   label: string;
   rank: number;
   daily_conversations: number;
-  likes_per_hour: number;
   started_today: number;
   in_grace: boolean;
   upheld_reports: number;
-  metrics: { has_photo: boolean; profile_ok: boolean; replies: number; referrals_joined: number; referrals_qualified: number };
+  matches: number;
+  metrics: {
+    has_photo: boolean;
+    profile_ok: boolean;
+    conversations: number;
+    responsive: boolean;
+    referrals_joined: number;
+    referrals_qualified: number;
+  };
   next: null | {
     tier: TierKey;
     label: string;
     daily_conversations: number;
-    likes_per_hour: number;
     needs_photo: boolean;
     needs_profile: boolean;
-    min_replies: number;
+    needs_responsive: boolean;
+    min_conversations: number;
     min_referrals: number;
   };
 };
@@ -89,6 +105,8 @@ export type Progress = {
 // Plain-language definitions shown wherever the levels are explained.
 export const DEFINITIONS = {
   completeProfile: "a headline, an “about you” of at least 40 characters, “what I’m looking for” of at least 20, your location and at least one relationship goal",
-  reply: "writing back to someone who messaged you first. Each person counts once, over the last 60 days",
+  conversation: "a chat where you and the other person have both written in the last 60 days. It counts once per person, and it doesn’t matter who started it",
+  responseRecord: "if people write to you first, you answer at least half of them. This only matters once three people have written to you, so you’re never marked down for messages you didn’t get",
+  match: "two members who have both liked each other. Messaging a match never uses up your daily new conversations",
   realMember: "someone you invited with your link who has passed the age check, been approved, added a photo, completed their profile and stayed live for 7 days",
 };

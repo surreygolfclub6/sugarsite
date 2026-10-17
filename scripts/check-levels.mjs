@@ -16,10 +16,10 @@ LEVELS.forEach((level, i) => {
     tier: level.tier === rule.tier,
     label: level.label === rule.label,
     conversationsPerDay: level.conversationsPerDay === rule.daily_conversations,
-    likesPerHour: level.likesPerHour === rule.likes_per_hour,
-    minReplies: level.minReplies === rule.min_replies,
+    minConversations: level.minConversations === rule.min_conversations,
     minFriends: level.minFriends === rule.min_referrals,
     needsPhotoAndProfile: level.needsPhotoAndProfile === (rule.needs_photo && rule.needs_profile),
+    needsResponseRecord: level.needsResponseRecord === rule.needs_responsive,
   };
   for (const [field, ok] of Object.entries(same)) if (!ok) problems.push(`${level.tier}: ${field} differs`);
 });

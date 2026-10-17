@@ -47,18 +47,25 @@ Confirm with AgeVerif which assurance level counts as highly effective for UK la
 ## Levels and invites
 
 Free usage is limited until a member earns more by contributing. `tier_rules` holds the four levels (Newcomer, Member, Trusted,
-Champion): new conversations a day, likes an hour, and what's needed to reach each. The rules are enforced in the database
-(`start_conversation` and the likes trigger read the member's level; nothing the caller passes can raise a limit), and replying
-is never limited. Level inputs: an approved photo, a complete profile, people replied to in the last 60 days, and invited friends
-who have become real members (live 7 days, age checked, photo, complete profile). The first 7 days after going live count as
-Member; an upheld report in the last 90 days caps a member at Member. An `unlimited_messaging` row in `entitlements` lifts the
-daily limit (the paywall flag no longer does).
+Champion): new conversations a day, and what's needed to reach each. The rules are enforced in the database (`start_conversation`
+reads the member's level; nothing the caller passes can raise the limit). Replying is never limited, and neither is messaging a
+match (two members who liked each other); a conversation with a match doesn't count towards the daily number either. There is no
+per-level limit on likes; a flat anti-bot limit (150 an hour) sits in the likes trigger and isn't shown to members.
+
+Level inputs: an approved photo, a complete profile, conversations (a chat where both people have written in the last 60 days,
+whoever started it, so members who receive no messages can still progress), a response record for Trusted and Champion (answer at
+least half of the people who write first, judged only once three have), and invited friends who have become real members (live 7
+days, age checked, photo, complete profile). The first 7 days after going live count as Member; an upheld report in the last 90
+days caps a member at Member. An `unlimited_messaging` row in `entitlements` lifts the daily limit (the paywall flag no longer does).
 
 Every member has a private invite code (`profiles.referral_code`, not readable through the API; the app reads your own on the
 server). The link is `/join?ref=CODE`, which stores the code in a cookie; sign-up calls `record_referral()` (service role only).
-Members see counts only. Moderators see "Invited by" on the approvals card. The pages that explain the levels (`/levels` and the
-homepage section) use `lib/levels.ts`; run `node --experimental-strip-types scripts/check-levels.mjs` after changing either that
-file or `tier_rules` to confirm they still agree.
+Members see counts only. Moderators see "Invited by" on the approvals card.
+
+Where members see it: the level card and invite link on More, the full ladder at More > Levels and invites (`/more/levels`, with the
+member's own progress ticked off), the public guide at `/levels`, the homepage section, and a level pill on profiles. All of them use
+`lib/levels.ts` and `components/level-ladder.tsx`; run `node --experimental-strip-types scripts/check-levels.mjs` after changing
+either that file or `tier_rules` to confirm they still agree.
 
 ## Account approval (testing phase)
 

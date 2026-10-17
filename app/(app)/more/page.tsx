@@ -30,6 +30,7 @@ async function More() {
         </Suspense>
       </div>
       <ul className="space-y-3">
+        <li><Link href="/more/levels" className={link}>Levels and invites</Link></li>
         <li><Link href="/more/profile" className={link}>Edit profile</Link></li>
         <li><Link href="/photos" className={link}>Your photos</Link></li>
         <li><Link href="/discover/filters" className={link}>Search filters</Link></li>

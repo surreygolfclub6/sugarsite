@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { FILTER_KEYS, SEARCH_COOKIE, SORTS, findProfiles, type Search } from "./search";
 
-export async function toggleLike(formData: FormData) {
+export async function toggleLike(formData: FormData): Promise<{ matched: boolean }> {
   const target = z.string().uuid().parse(formData.get("profile_id"));
   const liked = formData.get("liked") === "true";
 
@@ -17,11 +17,18 @@ export async function toggleLike(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { matched: false };
 
   // Row-level security rejects blocked pairs and likes from anyone but the signed-in member.
-  if (liked) await supabase.from("likes").delete().eq("from_user", user.id).eq("to_user", target);
-  else await supabase.from("likes").insert({ from_user: user.id, to_user: target });
+  if (liked) {
+    await supabase.from("likes").delete().eq("from_user", user.id).eq("to_user", target);
+    return { matched: false };
+  }
+  const { error } = await supabase.from("likes").insert({ from_user: user.id, to_user: target });
+  if (error) return { matched: false };
+  // A match is two members who have both liked each other. You can see likes you received, so this is just a lookup.
+  const { data: back } = await supabase.from("likes").select("from_user").eq("from_user", target).eq("to_user", user.id).maybeSingle();
+  return { matched: Boolean(back) };
 }
 
 // Saves the search form on this device, so the next visit starts from the same filters.

@@ -73,8 +73,9 @@ export default function PrivacyPage() {
         <li>To check that members are adults, and keep under-18s off the service, using an age check (our legal obligations under the Online Safety Act, and our legitimate interests).</li>
         <li>
           To set your level and limits: we count whether you have an approved photo and a complete profile, how many people
-          you have replied to, and how many people you invited have become real members. This uses counts, not the content of
-          your messages (our legitimate interests in keeping the community genuine).
+          you have had conversations with, whether you answer people who write to you first, and how many people you invited
+          have become real members. This uses counts, not the content of your messages (our legitimate interests in keeping the
+          community genuine). We also record likes so we can show you your matches.
         </li>
         <li>To meet legal obligations, and to deal with legal claims (legal obligation, legitimate interests).</li>
         <li>For special category data, your explicit consent.</li>
