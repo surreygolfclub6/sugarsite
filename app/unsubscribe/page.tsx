@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -17,7 +18,7 @@ async function stop(formData: FormData) {
   redirect("/unsubscribe?done=1");
 }
 
-export default async function Unsubscribe({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+async function UnsubscribeContent({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const valid = !!sp.u && !!sp.t && /^[0-9a-f-]{36}$/.test(sp.u) && validUnsubscribe(sp.u, sp.t);
   return (
@@ -45,5 +46,13 @@ export default async function Unsubscribe({ searchParams }: { searchParams: Prom
         </>
       )}
     </main>
+  );
+}
+
+export default function Unsubscribe({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  return (
+    <Suspense fallback={<main className="mx-auto w-full max-w-md px-5 py-16" aria-busy="true" />}>
+      <UnsubscribeContent searchParams={searchParams} />
+    </Suspense>
   );
 }
