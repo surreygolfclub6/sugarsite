@@ -20,7 +20,7 @@ import { SavedPicker } from "./saved-picker";
 import { AreaField } from "../area-field";
 import { MultiSelect } from "../multi-select";
 import { DualRangeField, RangeField } from "../sliders";
-import { applyFilters, deleteSavedSearch, editSavedSearch, openSavedSearch, resetFilters, saveSearch } from "../actions";
+import { applyFilters, deleteSavedSearch, loadSavedSearch, resetFilters, saveSearch } from "../actions";
 import { ANYWHERE, parseFilters, withSavedFilters, type Search } from "../search";
 
 export const metadata: Metadata = { title: "Search filters" };
@@ -96,8 +96,8 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
       {saved && saved.length > 0 && (
         <SavedPicker
           items={saved.map((s) => ({ id: s.id, name: s.name, summary: describe(s.query, areas) }))}
-          open={openSavedSearch}
-          edit={editSavedSearch}
+          current={typeof params.loaded === "string" ? params.loaded : undefined}
+          load={loadSavedSearch}
           remove={deleteSavedSearch}
         />
       )}

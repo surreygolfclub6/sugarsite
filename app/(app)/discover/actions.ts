@@ -80,31 +80,22 @@ export async function saveSearch(formData: FormData) {
   redirect(`/discover/filters?saved=ok&name=${encodeURIComponent(name.data)}&t=${Date.now()}`);
 }
 
-// Brings a saved search back: straight to its results (openSavedSearch), or into the form to adjust first (editSavedSearch).
-async function loadSavedSearch(formData: FormData, to: "results" | "filters") {
+// Picking a saved search fills the form with it; the member then adjusts it if they like and uses the main Search button.
+export async function loadSavedSearch(id: string) {
   const supabase = await createClient();
-  const id = z.string().uuid().safeParse(formData.get("id"));
-  if (!id.success) redirect("/discover/filters");
-  const { data } = await supabase.from("saved_searches").select("query, sort").eq("id", id.data).maybeSingle();
+  const parsed = z.string().uuid().safeParse(id);
+  if (!parsed.success) redirect("/discover/filters");
+  const { data } = await supabase.from("saved_searches").select("query").eq("id", parsed.data).maybeSingle();
   if (!data) redirect("/discover/filters");
   await remember(data.query);
   // A different address from the page the member is on, so the form is rebuilt from the loaded search.
-  if (to === "filters") redirect(`/discover/filters?loaded=${encodeURIComponent(id.data)}`);
-  redirect(data.sort !== "nearest" ? `/discover?sort=${data.sort}` : "/discover");
+  redirect(`/discover/filters?loaded=${encodeURIComponent(parsed.data)}`);
 }
 
-export async function openSavedSearch(formData: FormData) {
-  await loadSavedSearch(formData, "results");
-}
-
-export async function editSavedSearch(formData: FormData) {
-  await loadSavedSearch(formData, "filters");
-}
-
-export async function deleteSavedSearch(formData: FormData) {
+export async function deleteSavedSearch(id: string) {
   const supabase = await createClient();
-  const id = z.string().uuid().safeParse(formData.get("id"));
-  if (id.success) await supabase.from("saved_searches").delete().eq("id", id.data);
+  const parsed = z.string().uuid().safeParse(id);
+  if (parsed.success) await supabase.from("saved_searches").delete().eq("id", parsed.data);
   redirect(`/discover/filters?saved=deleted&t=${Date.now()}`);
 }
 
