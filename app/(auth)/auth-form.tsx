@@ -19,6 +19,16 @@ function LinkNotice() {
   );
 }
 
+function InvitedNote() {
+  const invited = useSearchParams().get("invited");
+  if (!invited) return null;
+  return (
+    <p role="status" className="mt-4 rounded-xl border border-line px-4 py-3 text-sm text-dusk">
+      You’ve been invited by a member. Joining is free.
+    </p>
+  );
+}
+
 function NextField() {
   const next = useSearchParams().get("next");
   return next ? <input type="hidden" name="next" value={next} /> : null;
@@ -35,9 +45,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   return (
     <div>
       <h1 className="display text-4xl">{isLogin ? "Welcome back" : "Create your profile"}</h1>
-      {isLogin && (
+      {isLogin ? (
         <Suspense fallback={null}>
           <LinkNotice />
+        </Suspense>
+      ) : (
+        <Suspense fallback={null}>
+          <InvitedNote />
         </Suspense>
       )}
       <p className="mt-3 text-dusk">

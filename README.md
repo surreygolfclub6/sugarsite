@@ -44,6 +44,22 @@ The database enforces the gate too: a member who isn't live can't see other memb
 in the RLS policies). Only the outcome is stored (`age_checks`), and one verification can back one account.
 Confirm with AgeVerif which assurance level counts as highly effective for UK law and set `MIN_ASSURANCE` in `lib/age-assurance.ts`.
 
+## Levels and invites
+
+Free usage is limited until a member earns more by contributing. `tier_rules` holds the four levels (Newcomer, Member, Trusted,
+Champion): new conversations a day, likes an hour, and what's needed to reach each. The rules are enforced in the database
+(`start_conversation` and the likes trigger read the member's level; nothing the caller passes can raise a limit), and replying
+is never limited. Level inputs: an approved photo, a complete profile, people replied to in the last 60 days, and invited friends
+who have become real members (live 7 days, age checked, photo, complete profile). The first 7 days after going live count as
+Member; an upheld report in the last 90 days caps a member at Member. An `unlimited_messaging` row in `entitlements` lifts the
+daily limit (the paywall flag no longer does).
+
+Every member has a private invite code (`profiles.referral_code`, not readable through the API; the app reads your own on the
+server). The link is `/join?ref=CODE`, which stores the code in a cookie; sign-up calls `record_referral()` (service role only).
+Members see counts only. Moderators see "Invited by" on the approvals card. The pages that explain the levels (`/levels` and the
+homepage section) use `lib/levels.ts`; run `node --experimental-strip-types scripts/check-levels.mjs` after changing either that
+file or `tier_rules` to confirm they still agree.
+
 ## Account approval (testing phase)
 
 While `app_flags.require_approval` is true, a new member waits for a moderator after finishing their profile and passing the

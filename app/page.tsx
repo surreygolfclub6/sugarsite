@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { COMPANY, SITE_NAME } from "@/lib/config";
 import { AgeBadge } from "@/components/age-badge";
+import { LevelBadge } from "@/components/level-badge";
+import { LEVELS } from "@/lib/levels";
 import { ProfileCarousel } from "@/components/profile-carousel";
 import { HomeImage } from "./home-image";
 import { FinalCta, HeaderActions, HeroActions } from "./home-session";
@@ -228,6 +230,9 @@ export default function Home() {
           <a href="#verified" className="hidden px-3 text-sm text-dusk hover:text-pearl md:block">
             Age verified
           </a>
+          <a href="#levels" className="hidden px-3 text-sm text-dusk hover:text-pearl md:block">
+            Levels
+          </a>
           <a href="#why" className="hidden px-3 text-sm text-dusk hover:text-pearl sm:block">
             Why {SITE_NAME}
           </a>
@@ -302,7 +307,7 @@ export default function Home() {
               <div className="rounded-[18px] border border-brass/50 bg-velvet p-6">
                 <p className="text-sm font-semibold uppercase tracking-wide text-brass">{SITE_NAME}</p>
                 <ul className="mt-4 space-y-3">
-                  <li className="flex gap-3"><Tick /> Free to join and start conversations</li>
+                  <li className="flex gap-3"><Tick /> Free to join and free to message, with more room as you contribute</li>
                   <li className="flex gap-3"><Tick /> Profiles that state what you want</li>
                   <li className="flex gap-3"><Tick /> Every member age-verified, every photo reviewed</li>
                   <li className="flex gap-3"><Tick /> No card needed, nothing to cancel</li>
@@ -352,6 +357,46 @@ export default function Home() {
                   </p>
                 </li>
               </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Levels */}
+        <section id="levels" className="border-t border-line bg-velvet/50">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
+            <div className="max-w-3xl">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-brass">Levels</p>
+              <h2 className="display text-[clamp(2rem,5vw,3.4rem)]">The more you give, the more you get.</h2>
+              <p className="serif-body mt-6 text-lg text-dusk">
+                {SITE_NAME} is free, and you earn more room by being a genuine member: a real photo, a complete profile,
+                replies to the people who write to you, and friends who join and stay. No payments, no gimmicks.
+              </p>
+            </div>
+
+            <ol className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {LEVELS.map((l, i) => (
+                <li key={l.tier} className={`flex flex-col rounded-[22px] border bg-velvet p-6 ${l.tier === "champion" ? "border-brass" : "border-line"}`}>
+                  <div className="flex items-center justify-between">
+                    <LevelBadge tier={l.tier} className="size-10" />
+                    <span className="text-xs text-dusk">Level {i + 1}</span>
+                  </div>
+                  <h3 className="display mt-4 text-3xl">{l.label}</h3>
+                  <p className="mt-1 text-sm text-dusk">{l.tagline}</p>
+                  <p className="mt-5 border-t border-line pt-4">
+                    <span className="display text-4xl">{l.conversationsPerDay}</span>
+                    <span className="ml-2 text-sm text-dusk">new conversations a day</span>
+                  </p>
+                  <p className="mt-3 text-sm text-dusk">{l.how}</p>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-[60ch] text-dusk">
+                Replying to someone who messages you is always unlimited. Every member also gets a personal invite link:
+                when friends join and become real members, you move up.
+              </p>
+              <Link href="/levels" className="btn btn-quiet shrink-0">See how levels work</Link>
             </div>
           </div>
         </section>

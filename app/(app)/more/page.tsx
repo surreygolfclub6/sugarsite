@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";
 import { ThemeSetting } from "@/components/theme-setting";
 import { COMPANY } from "@/lib/config";
+import { LevelCard } from "./level-card";
 
 export const metadata: Metadata = { title: "More" };
 
@@ -23,7 +24,12 @@ async function More() {
   return (
     <>
       <h1 className="display px-1 text-4xl">More</h1>
-      <ul className="mt-6 space-y-3">
+      <div className="mt-6">
+        <Suspense fallback={null}>
+          <LevelCard userId={user.id} />
+        </Suspense>
+      </div>
+      <ul className="space-y-3">
         <li><Link href="/more/profile" className={link}>Edit profile</Link></li>
         <li><Link href="/photos" className={link}>Your photos</Link></li>
         <li><Link href="/discover/filters" className={link}>Search filters</Link></li>

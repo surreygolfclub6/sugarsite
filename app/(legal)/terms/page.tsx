@@ -47,6 +47,25 @@ export default function TermsPage() {
         </li>
       </ul>
 
+      <h2>Levels and limits</h2>
+      <ul>
+        <li>
+          To keep {SITE_NAME} genuine, how many new conversations you can start, and how many people you can like each
+          hour, depends on your level: Newcomer, Member, Trusted or Champion. Replying to someone who has messaged you is
+          never limited.
+        </li>
+        <li>
+          Your level rises as you add a photo, complete your profile, reply to people and invite friends who become real
+          members, and it can fall if those things stop being true. An upheld report about you holds your level at Member for
+          90 days. See <Link href="/levels">How levels work</Link>.
+        </li>
+        <li>
+          You can invite friends with your personal link. Only invite people who would like to be here. Don’t pay, pressure,
+          threaten or push anyone to join, and don’t invite people who have asked you not to. We can remove a level or limit
+          you gained through fake or duplicate accounts, or through invites that break these terms.
+        </li>
+      </ul>
+
       <h2>What you can post</h2>
       <p>
         You own what you post, but you give us permission to show it to other members and to store and process it to

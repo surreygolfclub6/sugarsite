@@ -18,6 +18,8 @@ import {
   labelOf,
 } from "@/lib/profile-options";
 import { AgeBadge } from "@/components/age-badge";
+import { LevelBadge } from "@/components/level-badge";
+import type { TierKey } from "@/lib/levels";
 import { Gallery } from "./gallery";
 import { SafetyMenu } from "@/components/safety-menu";
 import { LikeFab, MessageBar } from "./profile-actions";
@@ -58,7 +60,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
 
   // Everything the page needs is independent of the profile row, so it's all fetched at once.
   // Row-level security hides inactive, suspended and blocked members, so they 404 like a bad link.
-  const [{ data: p }, { data: ageRows }, { data: rows }, { data: distance }, { data: iLiked }, { data: theyLiked }] = await Promise.all([
+  const [{ data: p }, { data: ageRows }, { data: rows }, { data: distance }, { data: iLiked }, { data: theyLiked }, { data: tierRows }] = await Promise.all([
     supabase
       .from("profiles")
       .select(
@@ -71,7 +73,9 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
     supabase.rpc("distance_band", { target: id }),
     supabase.from("likes").select("to_user").eq("from_user", user.id).eq("to_user", id).maybeSingle(),
     supabase.from("likes").select("from_user").eq("from_user", id).eq("to_user", user.id).maybeSingle(),
+    supabase.rpc("member_tiers", { ids: [id] }),
   ]);
+  const level = tierRows?.[0] as { tier: TierKey; label: string } | undefined;
   if (!p) notFound();
   const age: number | undefined = ageRows?.[0]?.age;
 
@@ -155,6 +159,12 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
             <li className={`rounded-full border px-3 py-1 ${p.age_verified ? "border-brass text-brass" : "border-line text-dusk opacity-60"}`}>
               {p.age_verified ? "Age verified" : "Age not verified"}
             </li>
+            {level && (
+              <li className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1">
+                <LevelBadge tier={level.tier} className="size-4" />
+                {level.label}
+              </li>
+            )}
           </ul>
           <p className="mt-2 text-xs text-dusk">
             {p.age_verified ? "This member passed an age check confirming they’re an adult. It doesn’t confirm who they are." : "This member joined before age checks were introduced."}

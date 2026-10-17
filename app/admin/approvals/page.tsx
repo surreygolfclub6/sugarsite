@@ -28,6 +28,15 @@ async function Approvals() {
         admin.from("photos").select("id, user_id, storage_path, moderation").in("user_id", ids).order("position"),
       ])
     : [{ data: [] }, { data: [] }];
+  // Moderators can see who invited each waiting member. Members only ever see counts.
+  const { data: invites } = ids.length ? await admin.from("referrals").select("referred_id, referrer_id").in("referred_id", ids) : { data: [] };
+  const { data: referrers } = invites?.length
+    ? await admin.from("profiles").select("id, display_name").in("id", [...new Set(invites.map((r) => r.referrer_id))])
+    : { data: [] };
+  const invitedBy = (id: string) => {
+    const r = invites?.find((x) => x.referred_id === id);
+    return r ? (referrers?.find((p) => p.id === r.referrer_id)?.display_name ?? "a member") : null;
+  };
   const { data: signed } = photos?.length
     ? await admin.storage.from("photos").createSignedUrls(photos.map((p) => p.storage_path), 600)
     : { data: [] };
@@ -62,6 +71,7 @@ async function Approvals() {
                   ? `Age verified · level ${check.assurance_level ?? "?"} · over ${check.age_threshold} · ${check.country ?? "?"}`
                   : "No age check on record"}
               </p>
+              {invitedBy(m.id) && <p className="mt-3 text-sm text-dusk">Invited by {invitedBy(m.id)}</p>}
               {m.headline && <p className="mt-4 font-medium">{m.headline}</p>}
               {m.bio && <p className="mt-2 whitespace-pre-line text-sm">{m.bio}</p>}
               {m.looking_for && <p className="mt-2 whitespace-pre-line text-sm text-dusk">{m.looking_for}</p>}

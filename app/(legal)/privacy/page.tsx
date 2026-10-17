@@ -30,6 +30,10 @@ export default function PrivacyPage() {
           assurance level it reached, your country, a reference for the check, and when it was done and when it expires.
           We do not receive or keep your face image or identity documents.
         </li>
+        <li>
+          <strong>Invites:</strong> a personal invite code for each member. If you join through someone’s link, we record who
+          invited you so they can be credited. They see only counts, never who joined; our moderators can see who invited whom.
+        </li>
         <li><strong>Activity:</strong> your likes, the people you block, reports you make, your messages, and when you were last active.</li>
         <li>
           <strong>Technical:</strong> basic information needed to run and secure the service, such as your IP address
@@ -67,6 +71,11 @@ export default function PrivacyPage() {
         <li>To provide the service you asked for: creating your profile, showing you to and finding other members, and messaging (contract).</li>
         <li>To keep members safe: reviewing photos, handling reports and preventing fraud (our legitimate interests, and legal duties).</li>
         <li>To check that members are adults, and keep under-18s off the service, using an age check (our legal obligations under the Online Safety Act, and our legitimate interests).</li>
+        <li>
+          To set your level and limits: we count whether you have an approved photo and a complete profile, how many people
+          you have replied to, and how many people you invited have become real members. This uses counts, not the content of
+          your messages (our legitimate interests in keeping the community genuine).
+        </li>
         <li>To meet legal obligations, and to deal with legal claims (legal obligation, legitimate interests).</li>
         <li>For special category data, your explicit consent.</li>
       </ul>

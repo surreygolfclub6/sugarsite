@@ -56,6 +56,15 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
       .eq("id", data.user.id);
   }
 
+  // If they arrived through a member's invite link, record who invited them. This never blocks signing up, and the
+  // database ignores unknown codes, codes from members who aren't live, and self-invites.
+  const jar = await cookies();
+  const ref = jar.get("ref")?.value;
+  if (data.user && ref) {
+    await createAdminClient().rpc("record_referral", { referred: data.user.id, code: ref });
+    jar.delete("ref");
+  }
+
   // With email confirmation on, there's no session yet. Remember the address (in a cookie, not the URL)
   // so the "check your email" page can show it and offer to resend.
   if (!data.session) {
