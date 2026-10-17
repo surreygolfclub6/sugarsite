@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { connection } from "next/server";
+import { after, connection } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -52,37 +52,33 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  await touchActive(user.id);
+  // Recording activity is a write the page doesn't wait on, so it runs after the response is sent.
+  after(() => touchActive(user.id));
 
+  // Everything the page needs is independent of the profile row, so it's all fetched at once.
   // Row-level security hides inactive, suspended and blocked members, so they 404 like a bad link.
-  const { data: p } = await supabase
-    .from("profiles")
-    .select(
-      "id, display_name, city, headline, bio, looking_for, gender, seeking, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, last_active_at, created_at, id_verified, photo_verified",
-    )
-    .eq("id", id)
-    .single();
+  const [{ data: p }, { data: ageRows }, { data: rows }, { data: distance }, { data: iLiked }, { data: theyLiked }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(
+        "id, display_name, city, headline, bio, looking_for, gender, seeking, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, last_active_at, created_at, id_verified, photo_verified",
+      )
+      .eq("id", id)
+      .single(),
+    supabase.rpc("member_ages", { ids: [id] }),
+    supabase.from("photos").select("storage_path").eq("user_id", id).eq("moderation", "approved").order("position"),
+    supabase.rpc("distance_band", { target: id }),
+    supabase.from("likes").select("to_user").eq("from_user", user.id).eq("to_user", id).maybeSingle(),
+    supabase.from("likes").select("from_user").eq("from_user", id).eq("to_user", user.id).maybeSingle(),
+  ]);
   if (!p) notFound();
-  const { data: ageRows } = await supabase.rpc("member_ages", { ids: [id] });
   const age: number | undefined = ageRows?.[0]?.age;
 
-  const { data: rows } = await supabase
-    .from("photos")
-    .select("storage_path")
-    .eq("user_id", id)
-    .eq("moderation", "approved")
-    .order("position");
   const paths = (rows ?? []).map((r) => r.storage_path);
   const { data: signed } = paths.length
     ? await createAdminClient().storage.from("photos").createSignedUrls(paths, 3600)
     : { data: [] };
   const urls = paths.flatMap((path) => signed?.find((s) => s.path === path)?.signedUrl ?? []);
-
-  const [{ data: distance }, { data: iLiked }, { data: theyLiked }] = await Promise.all([
-    supabase.rpc("distance_band", { target: id }),
-    supabase.from("likes").select("to_user").eq("from_user", user.id).eq("to_user", id).maybeSingle(),
-    supabase.from("likes").select("from_user").eq("from_user", id).eq("to_user", user.id).maybeSingle(),
-  ]);
 
   const name = p.display_name ?? "Member";
   const own = p.id === user.id;

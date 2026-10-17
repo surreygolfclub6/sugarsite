@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { connection } from "next/server";
+import { after, connection } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
@@ -22,7 +22,8 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  await touchActive(user.id);
+  // Recording activity is a write the page doesn't wait on, so it runs after the response is sent.
+  after(() => touchActive(user.id));
 
   // Row-level security only returns conversations you're part of, so anyone else gets a 404.
   const { data: conversation } = await supabase.from("conversations").select("id, user_a, user_b").eq("id", id).single();

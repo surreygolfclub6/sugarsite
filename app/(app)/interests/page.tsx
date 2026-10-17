@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
+import { after, connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
 import { isOnline } from "@/lib/people";
@@ -21,7 +21,8 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  await touchActive(user.id);
+  // Recording activity is a write the page doesn't wait on, so it runs after the response is sent.
+  after(() => touchActive(user.id));
 
   // The likes table only lets you see likes you sent or received.
   const { data: likes } = await supabase

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
+import { after, connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
 import { PlacePicker } from "@/app/onboarding/place-picker";
@@ -33,7 +33,8 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
 
   const { data: me } = await supabase.from("profiles").select("status, place_id").eq("id", user.id).single();
   if (!me || me.status === "incomplete") redirect("/onboarding");
-  await touchActive(user.id);
+  // Recording activity is a write the page doesn't wait on, so it runs after the response is sent.
+  after(() => touchActive(user.id));
 
   const { data: photos } = await supabase.from("photos").select("moderation").eq("user_id", user.id);
   const count = (m: string) => (photos ?? []).filter((p) => p.moderation === m).length;
