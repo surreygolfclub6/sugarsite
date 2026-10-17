@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AgeBadge } from "@/components/age-badge";
 import { SafetyMenu } from "@/components/safety-menu";
-import { SharePhotosButton } from "@/components/share-photos-button";
 import { createClient, realtimeReady } from "@/lib/supabase/client";
 import { loadEarlier, loadSince, markRead, photoUrl, sendMessage, type Message } from "../actions";
 
@@ -216,8 +215,7 @@ export function Thread({
             </span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
-            <SharePhotosButton meId={meId} otherId={other.id} name={other.name} canShare={sharing.canShare} shared={sharing.shared} />
-            <SafetyMenu profileId={other.id} name={other.name} conversationId={conversationId} />
+            <SafetyMenu profileId={other.id} name={other.name} conversationId={conversationId} privateSharing={{ meId, canShare: sharing.canShare, shared: sharing.shared }} />
           </div>
         </div>
       </header>

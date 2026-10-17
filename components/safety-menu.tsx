@@ -3,19 +3,41 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { blockMember, reportMember } from "@/app/(app)/safety/actions";
+import { deleteConversation } from "@/app/(app)/messages/actions";
+import { createClient } from "@/lib/supabase/client";
 import { REPORT_REASONS } from "@/lib/safety";
 
-type Props = { profileId: string; name: string; conversationId?: string };
+// In a conversation the menu also carries your private-photo sharing with this person, and deleting the conversation.
+type Props = {
+  profileId: string;
+  name: string;
+  conversationId?: string;
+  privateSharing?: { meId: string; canShare: boolean; shared: boolean };
+};
 
 const dialogStyle =
   "m-auto w-[min(92vw,28rem)] rounded-2xl border border-line bg-velvet p-5 text-pearl backdrop:bg-black/70";
 
 // The "..." menu on a profile or conversation: report or block that member.
-export function SafetyMenu({ profileId, name, conversationId }: Props) {
+export function SafetyMenu({ profileId, name, conversationId, privateSharing }: Props) {
   const [open, setOpen] = useState(false);
+  const [shared, setShared] = useState(privateSharing?.shared ?? false);
+  const [sharing, setSharing] = useState<string>();
+  const shareDialog = useRef<HTMLDialogElement>(null);
+  const deleteDialog = useRef<HTMLDialogElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const blockDialog = useRef<HTMLDialogElement>(null);
   const reportDialog = useRef<HTMLDialogElement>(null);
+
+  // Stopping takes one tap; sharing asks first (see ShareDialog).
+  async function stopSharing() {
+    if (!privateSharing) return;
+    setOpen(false);
+    const { error } = await createClient().from("photo_shares").delete().eq("owner_id", privateSharing.meId).eq("viewer_id", profileId);
+    if (!error) setShared(false);
+    setSharing(error ? "We couldn’t stop sharing. Please try again." : `You’ve stopped sharing your private photos with ${name}.`);
+    setTimeout(() => setSharing(undefined), 4000);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -47,7 +69,27 @@ export function SafetyMenu({ profileId, name, conversationId }: Props) {
         </svg>
       </button>
       {open && (
-        <ul role="menu" className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-line bg-velvet shadow-lg">
+        <ul role="menu" className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-velvet shadow-lg">
+          {privateSharing && (shared || privateSharing.canShare) && (
+            <li role="none">
+              {shared ? (
+                <button role="menuitem" type="button" className="w-full px-4 py-3 text-left hover:bg-velvet-2" onClick={stopSharing}>
+                  Stop sharing private photos
+                </button>
+              ) : (
+                <button role="menuitem" type="button" className="w-full px-4 py-3 text-left hover:bg-velvet-2" onClick={() => { setOpen(false); shareDialog.current?.showModal(); }}>
+                  Share private photos
+                </button>
+              )}
+            </li>
+          )}
+          {conversationId && (
+            <li role="none">
+              <button role="menuitem" type="button" className="w-full px-4 py-3 text-left hover:bg-velvet-2" onClick={() => { setOpen(false); deleteDialog.current?.showModal(); }}>
+                Delete conversation
+              </button>
+            </li>
+          )}
           <li role="none">
             <button role="menuitem" type="button" className="w-full px-4 py-3 text-left hover:bg-velvet-2" onClick={() => { setOpen(false); reportDialog.current?.showModal(); }}>
               Report {name}
@@ -60,9 +102,83 @@ export function SafetyMenu({ profileId, name, conversationId }: Props) {
           </li>
         </ul>
       )}
+      {sharing && <p role="status" className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-line bg-velvet px-4 py-3 text-sm shadow-lg">{sharing}</p>}
+      {privateSharing && (
+        <ShareDialog
+          dialogRef={shareDialog}
+          meId={privateSharing.meId}
+          otherId={profileId}
+          name={name}
+          onShared={() => {
+            setShared(true);
+            setSharing(`${name} can now see your private photos.`);
+            setTimeout(() => setSharing(undefined), 4000);
+          }}
+        />
+      )}
+      {conversationId && <DeleteDialog dialogRef={deleteDialog} conversationId={conversationId} name={name} />}
       <BlockDialog dialogRef={blockDialog} profileId={profileId} name={name} />
       <ReportDialog dialogRef={reportDialog} profileId={profileId} name={name} conversationId={conversationId} />
     </div>
+  );
+}
+
+function ShareDialog({ dialogRef, meId, otherId, name, onShared }: { dialogRef: React.RefObject<HTMLDialogElement | null>; meId: string; otherId: string; name: string; onShared: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+  async function share() {
+    setBusy(true);
+    setError(undefined);
+    const { error: failed } = await createClient().from("photo_shares").insert({ owner_id: meId, viewer_id: otherId });
+    setBusy(false);
+    if (failed && failed.code !== "23505") return setError("We couldn’t share. Please try again.");
+    dialogRef.current?.close();
+    onShared();
+  }
+  return (
+    <dialog ref={dialogRef} aria-labelledby="share-title" className={dialogStyle}>
+      <h2 id="share-title" className="display text-2xl">Share private photos with {name}?</h2>
+      <p className="mt-3 text-dusk">
+        {name} will be able to see all your private photos until you stop sharing. Anyone who can see a photo could save
+        it, so only share with people you trust.
+      </p>
+      {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
+      <div className="mt-5 flex justify-end gap-3">
+        <button type="button" className="btn btn-quiet" onClick={() => dialogRef.current?.close()}>Cancel</button>
+        <button type="button" disabled={busy} className="btn btn-primary" onClick={share}>{busy ? "Sharing…" : "Yes, share"}</button>
+      </div>
+    </dialog>
+  );
+}
+
+function DeleteDialog({ dialogRef, conversationId, name }: { dialogRef: React.RefObject<HTMLDialogElement | null>; conversationId: string; name: string }) {
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string>();
+  return (
+    <dialog ref={dialogRef} aria-labelledby="delete-title" className={dialogStyle}>
+      <h2 id="delete-title" className="display text-2xl">Delete this conversation?</h2>
+      <p className="mt-3 text-dusk">
+        It disappears from your messages. {name} keeps their copy and isn’t told. If {name} writes again, the conversation
+        comes back with only the new messages.
+      </p>
+      {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
+      <div className="mt-5 flex justify-end gap-3">
+        <button type="button" className="btn btn-quiet" onClick={() => dialogRef.current?.close()}>Cancel</button>
+        <button
+          type="button"
+          disabled={pending}
+          className="btn btn-primary"
+          onClick={() =>
+            startTransition(async () => {
+              const result = await deleteConversation(conversationId);
+              if (result?.error) setError(result.error);
+            })
+          }
+        >
+          {pending ? "Deleting…" : "Delete conversation"}
+        </button>
+      </div>
+    </dialog>
   );
 }
 

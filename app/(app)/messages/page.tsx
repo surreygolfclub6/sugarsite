@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
 import { shortTime } from "@/lib/people";
 import { firstPhotos } from "../discover/search";
+import { Toast } from "@/components/toast";
 import { RefreshOnMessage } from "./refresh-on-message";
 
 export const metadata: Metadata = { title: "Messages" };
@@ -22,8 +23,9 @@ type Row = {
   unread: number;
 };
 
-async function Messages() {
+async function Messages({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   await connection();
+  const sp = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,6 +41,7 @@ async function Messages() {
   return (
     <>
       <RefreshOnMessage />
+      <Toast key={sp.deleted ?? ""} message={sp.deleted ? "Conversation deleted." : undefined} cleanPath="/messages" />
       <h1 className="display px-1 text-4xl">Messages</h1>
 
       {rows.length === 0 ? (
@@ -87,10 +90,10 @@ async function Messages() {
   );
 }
 
-export default function MessagesPage() {
+export default function MessagesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   return (
     <Suspense fallback={<div className="mt-8" aria-busy="true" />}>
-      <Messages />
+      <Messages searchParams={searchParams} />
     </Suspense>
   );
 }

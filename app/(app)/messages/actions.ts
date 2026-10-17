@@ -88,6 +88,16 @@ export async function photoUrl(conversationId: string, photoId: string): Promise
   return row.photo_url;
 }
 
+// Deletes a conversation for you only. The other person keeps theirs; moderators can still see it if it was reported.
+export async function deleteConversation(conversationId: string): Promise<{ error: string } | void> {
+  const { supabase } = await signedIn();
+  const id = uuid.safeParse(conversationId);
+  if (!id.success) return { error: "We couldn’t delete that conversation." };
+  const { error } = await supabase.rpc("clear_conversation", { conv: id.data });
+  if (error) return { error: "We couldn’t delete that conversation. Please try again." };
+  redirect(`/messages?deleted=${Date.now()}`);
+}
+
 export async function markRead(conversationId: string) {
   const { supabase, user } = await signedIn();
   const id = uuid.safeParse(conversationId);
