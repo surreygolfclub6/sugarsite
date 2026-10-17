@@ -32,14 +32,11 @@ function Cross() {
   );
 }
 
-// Examples of how members describe themselves. Invented, and labelled as examples on the page. Elena uses
-// hero.jpg; for the others, drop a photo named profile-<slug>.jpg into public/images/home and it replaces the gradient.
+// Examples of how members describe themselves. Invented, and labelled as examples on the page. They are snippets, not
+// real people: a description in place of a name, and no photo.
 const exampleProfiles = [
   {
-    slug: "elena",
-    image: "hero.jpg",
-    alt: "A woman seated at a restaurant table as her date arrives",
-    name: "Elena",
+    title: "Adventurous mistress",
     age: 29,
     city: "London",
     headline: "Between projects and travelling a lot. I like good dinners and someone who’s easy to talk to.",
@@ -47,8 +44,7 @@ const exampleProfiles = [
     goals: ["Long-term", "Casual dating"],
   },
   {
-    slug: "marcus",
-    name: "Marcus",
+    title: "Generous gentleman",
     age: 41,
     city: "Manchester",
     headline: "Founder, always between flights. Slow Sundays when I’m home.",
@@ -56,8 +52,7 @@ const exampleProfiles = [
     goals: ["Long-term", "Friendship"],
   },
   {
-    slug: "priya",
-    name: "Priya",
+    title: "Cultured companion",
     age: 34,
     city: "Birmingham",
     headline: "A surgeon who cooks better than she sleeps.",
@@ -65,8 +60,7 @@ const exampleProfiles = [
     goals: ["Long-term", "Casual dating"],
   },
   {
-    slug: "james",
-    name: "James",
+    title: "Easygoing gentleman",
     age: 52,
     city: "Edinburgh",
     headline: "Recently single, quietly confident, better company than I look.",
@@ -74,14 +68,22 @@ const exampleProfiles = [
     goals: ["Friendship", "Not sure yet"],
   },
   {
-    slug: "chloe",
-    name: "Chloe",
+    title: "Free-spirited creative",
     age: 27,
     city: "Bristol",
     headline: "Designer, paddleboarder, planner of far-too-many trips.",
     looking: "Someone established and kind who knows what they want, and says so. I’d rather be direct than guess.",
     goals: ["Casual dating", "Marriage minded"],
   },
+];
+
+// A soft colour for the top of each snippet, so the row doesn't look like five copies of one card.
+const tones = [
+  "linear-gradient(135deg, #b8405e, #5b1f35)",
+  "linear-gradient(135deg, #a8772f, #4e3413)",
+  "linear-gradient(135deg, #6b55a3, #2c2250)",
+  "linear-gradient(135deg, #2f7f78, #123a38)",
+  "linear-gradient(135deg, #b25a43, #55231a)",
 ];
 
 function ExampleCard({ p, index }: { p: (typeof exampleProfiles)[number]; index: number }) {
@@ -92,29 +94,14 @@ function ExampleCard({ p, index }: { p: (typeof exampleProfiles)[number]; index:
         index === 2 ? "lg:hidden xl:flex" : index > 2 ? "lg:hidden" : ""
       }`}
     >
-      <div className="relative">
-        <HomeImage
-          name={"image" in p && p.image ? p.image : `profile-${p.slug}.jpg`}
-          alt={"alt" in p && p.alt ? p.alt : `${p.name}, an example member`}
-          sizes="(min-width: 1280px) 260px, (min-width: 1024px) 340px, 90vw"
-          priority={index === 0}
-          tone={index}
-          initial={p.name.slice(0, 1)}
-          className="aspect-[4/4.2]"
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(22,15,24,0.92) 0%, rgba(22,15,24,0) 55%)" }}
-        />
-        <div className="absolute bottom-4 left-5 right-5 text-white">
-          <p className="display flex items-center gap-2 text-3xl">
-            {p.name}, {p.age} <AgeBadge className="size-5" />
-          </p>
-          <p className="text-sm text-white/75">{p.city}</p>
-        </div>
-        <span className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white/85 backdrop-blur">
+      <div className="relative px-5 pb-5 pt-12 text-white" style={{ background: tones[index % tones.length] }}>
+        <span className="absolute left-4 top-4 rounded-full bg-black/35 px-3 py-1 text-xs text-white/90 backdrop-blur">
           Example profile
         </span>
+        <p className="display flex items-center gap-2 text-3xl leading-tight">{p.title}</p>
+        <p className="mt-2 flex items-center gap-2 text-sm text-white/80">
+          {p.age} · {p.city} <AgeBadge className="size-4" />
+        </p>
       </div>
       <div className="flex flex-1 flex-col gap-4 p-5">
         <p className="serif-body italic text-pearl/90">“{p.headline}”</p>
@@ -269,7 +256,7 @@ export default function Home() {
           <div className="rise min-w-0">
             <ProfileCarousel label="Example profiles">
               {exampleProfiles.map((p, i) => (
-                <ExampleCard key={p.slug} p={p} index={i} />
+                <ExampleCard key={p.title} p={p} index={i} />
               ))}
             </ProfileCarousel>
           </div>
