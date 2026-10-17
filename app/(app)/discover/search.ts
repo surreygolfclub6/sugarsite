@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -8,7 +9,6 @@ import {
   MIN_HEIGHT_CM,
   RELATIONSHIP_GOALS,
   RELATIONSHIP_STATUSES,
-  SEEKING,
 } from "@/lib/profile-options";
 
 export type Search = Record<string, string | string[] | undefined>;
@@ -46,6 +46,24 @@ const choices = (v: string | string[] | undefined, options: readonly { value: st
   return unique.length === options.length ? [] : unique;
 };
 
+// The form fields that make up a search. They're remembered on this device until the member resets them.
+export const FILTER_KEYS = ["miles", "where", "area", "age_min", "age_max", "height_min", "height_max", "goal", "status", "body", "hair", "ethnicity"] as const;
+export const SEARCH_COOKIE = "search_filters";
+
+// When the address carries no filters of its own, use the ones the member saved last time.
+export async function withSavedFilters(sp: Search): Promise<Search> {
+  if (FILTER_KEYS.some((k) => sp[k] !== undefined)) return sp;
+  const saved = (await cookies()).get(SEARCH_COOKIE)?.value;
+  if (!saved) return sp;
+  const merged: Search = { ...sp };
+  for (const [key, value] of new URLSearchParams(saved)) {
+    if (!(FILTER_KEYS as readonly string[]).includes(key)) continue;
+    const current = merged[key];
+    merged[key] = current === undefined ? value : Array.isArray(current) ? [...current, value] : [current, value];
+  }
+  return merged;
+}
+
 export function parseFilters(sp: Search) {
   const sort = SORTS.find((o) => o.value === sp.sort)?.value ?? "nearest";
   const ageA = num(sp.age_min, 18, 18, 99);
@@ -60,7 +78,6 @@ export function parseFilters(sp: Search) {
     heightMax: Math.max(heightA, heightB),
     miles: num(sp.miles, 50, 5, ANYWHERE),
     areaId: sp.where === "other" ? num(sp.area, 0, 0, 2147483647) : 0,
-    show: choices(sp.show, SEEKING),
     goals: choices(sp.goal, RELATIONSHIP_GOALS),
     body: choices(sp.body, BODY_TYPES),
     hair: choices(sp.hair, HAIR_COLOURS),
@@ -107,7 +124,8 @@ export async function findProfiles(sp: Search, page: number): Promise<{ cards: C
     age_max: f.ageMax,
     max_miles: f.miles >= ANYWHERE ? null : f.miles,
     center_place: f.areaId || null,
-    genders: f.show.length ? f.show : null,
+    // Matching on who you're seeking and who seeks you is done in the database, so there is no gender filter.
+    genders: null,
     goals: f.goals.length ? f.goals : null,
     body_types: f.body.length ? f.body : null,
     hair_colours: f.hair.length ? f.hair : null,

@@ -180,7 +180,7 @@ test("search form: sliders narrow by age, height and distance, then Edit search 
   await setRange(page.getByLabel("Minimum height"), 206);
   await page.getByRole("button", { name: "Search" }).click();
 
-  await expect(page).toHaveURL(/\/discover\?/);
+  await expect(page).toHaveURL(/\/discover$/);
   await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
   await expect(card(page, "older")).toHaveCount(0);
   await expect(card(page, "nophoto")).toHaveCount(0);
@@ -188,7 +188,7 @@ test("search form: sliders narrow by age, height and distance, then Edit search 
 
   // Edit search returns to the form with everything still set.
   await page.getByRole("link", { name: "Edit search" }).click();
-  await expect(page).toHaveURL(/\/discover\/filters\?/);
+  await expect(page).toHaveURL(/\/discover\/filters$/);
   await expect(page.getByLabel("Maximum age")).toHaveValue("40");
   await expect(page.getByLabel("Minimum height")).toHaveValue("206");
 
@@ -201,6 +201,27 @@ test("search form: sliders narrow by age, height and distance, then Edit search 
   await expect(page.getByText("Anywhere in the UK")).toBeVisible();
   await page.getByRole("button", { name: "Search" }).click();
   await expect(card(page, "far")).toBeVisible();
+});
+
+test("filters are remembered between visits until they are reset", async ({ page }) => {
+  await signIn(page, "viewer");
+  await page.goto(`/discover/filters?${TESTERS}`);
+  await setRange(page.getByLabel("Maximum age"), 40);
+  await page.getByRole("button", { name: "Search" }).click();
+  await expect(card(page, "older")).toHaveCount(0);
+
+  // Leave and come back with a bare address: the same filters apply, and the button shows they're on.
+  await page.goto("/interests");
+  await page.goto("/discover");
+  await expect(card(page, "older")).toHaveCount(0);
+  await page.getByRole("link", { name: "Edit search (filters on)" }).click();
+  await expect(page.getByLabel("Maximum age")).toHaveValue("40");
+
+  // Reset is the only thing that clears them.
+  await page.getByRole("button", { name: "Reset" }).click();
+  await expect(page.getByLabel("Maximum age")).toHaveValue("99");
+  await page.goto("/discover");
+  await expect(page.getByRole("link", { name: "Edit search", exact: true })).toBeVisible();
 });
 
 test("dropdown filters allow several choices, with a select all", async ({ page }) => {

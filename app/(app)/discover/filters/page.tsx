@@ -12,19 +12,19 @@ import {
   MIN_HEIGHT_CM,
   RELATIONSHIP_GOALS,
   RELATIONSHIP_STATUSES,
-  SEEKING,
 } from "@/lib/profile-options";
 import { placeLabel } from "@/lib/places";
 import { AreaField } from "../area-field";
 import { MultiSelect } from "../multi-select";
 import { DualRangeField, RangeField } from "../sliders";
-import { ANYWHERE, parseFilters, type Search } from "../search";
+import { applyFilters, resetFilters } from "../actions";
+import { ANYWHERE, parseFilters, withSavedFilters, type Search } from "../search";
 
 export const metadata: Metadata = { title: "Search filters" };
 
 async function SearchContent({ searchParams }: { searchParams: Promise<Search> }) {
   await connection();
-  const sp = await searchParams;
+  const sp = await withSavedFilters(await searchParams);
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,7 +33,7 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
 
   const { data: me } = await supabase
     .from("profiles")
-    .select("status, place_id, city, seeking")
+    .select("status, place_id, city")
     .eq("id", user.id)
     .single();
   if (!me || me.status === "incomplete") redirect("/onboarding");
@@ -43,7 +43,6 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
     ? await supabase.from("uk_places").select("id, name, county, nation").eq("id", f.areaId).single()
     : { data: null };
   const initialArea = area ? { id: area.id, text: placeLabel(area) } : null;
-  const showOptions = SEEKING.filter((o) => (me.seeking as string[]).includes(o.value));
 
   // "Select all" is stored as no filter, so show it as all-selected again when the form is reopened.
   const all = (picked: string[], options: readonly { value: string }[]) =>
@@ -56,7 +55,7 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
         <Link href={`/discover?${sp.sort ? `sort=${f.sort}` : ""}`} className="btn btn-quiet">Back</Link>
       </div>
 
-      <form key={JSON.stringify(sp)} action="/discover" method="get" aria-label="Search" className="mt-6 space-y-8">
+      <form key={JSON.stringify(sp)} action={applyFilters} aria-label="Search" className="mt-6 space-y-8">
         <input type="hidden" name="sort" value={f.sort} />
         <div className="grid gap-6 md:grid-cols-2">
           <AreaField myArea={me.place_id ? me.city : null} initialArea={initialArea} />
@@ -66,7 +65,6 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <MultiSelect name="show" label="Show me" options={showOptions} defaultValues={all(f.show, showOptions)} />
           <MultiSelect name="goal" label="They’re looking for" options={RELATIONSHIP_GOALS} defaultValues={all(f.goals, RELATIONSHIP_GOALS)} />
           <MultiSelect name="status" label="Relationship status" options={RELATIONSHIP_STATUSES} defaultValues={all(f.status, RELATIONSHIP_STATUSES)} />
           <MultiSelect name="body" label="Body type" options={BODY_TYPES} defaultValues={all(f.body, BODY_TYPES)} />
@@ -76,7 +74,7 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
 
         <div className="flex gap-3">
           <button className="btn btn-primary">Search</button>
-          <Link href="/discover/filters" className="btn btn-quiet">Reset</Link>
+          <button type="submit" formAction={resetFilters} className="btn btn-quiet">Reset</button>
         </div>
       </form>
     </>

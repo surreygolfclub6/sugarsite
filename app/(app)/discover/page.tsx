@@ -6,7 +6,7 @@ import { after, connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
 import { PlacePicker } from "@/app/onboarding/place-picker";
-import { SORTS, findProfiles, parseFilters, type Search } from "./search";
+import { SORTS, findProfiles, parseFilters, withSavedFilters, type Search } from "./search";
 import { setMyLocation } from "./actions";
 import { TileGrid } from "./tile-grid";
 
@@ -24,7 +24,7 @@ const withParams = (sp: Search, set: Record<string, string> = {}) => {
 
 async function Results({ searchParams }: { searchParams: Promise<Search> }) {
   await connection();
-  const sp = await searchParams;
+  const sp = await withSavedFilters(await searchParams);
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,7 +42,10 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
   const rejected = count("rejected");
   const approved = count("approved");
 
-  const { sort } = parseFilters(sp);
+  const parsed = parseFilters(sp);
+  const { sort } = parsed;
+  // A dot on the filter button shows when anything other than the defaults is applied.
+  const filtered = JSON.stringify({ ...parsed, sort: "" }) !== JSON.stringify({ ...parseFilters({}), sort: "" });
   const qs = withParams(sp, { sort });
   const { cards, hasNext } = me.status === "active" ? await findProfiles(sp, 1) : { cards: [], hasNext: false };
 
@@ -50,7 +53,8 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
     <>
       <div className="flex items-center justify-between px-1">
         <h1 className="display text-4xl">Search</h1>
-        <Link href={`/discover/filters?${withParams(sp)}`} aria-label="Edit search" className="btn btn-quiet !p-3">
+        <Link href="/discover/filters" aria-label={filtered ? "Edit search (filters on)" : "Edit search"} className="btn btn-quiet relative !p-3">
+          {filtered && <span aria-hidden className="absolute right-1.5 top-1.5 size-2.5 rounded-full bg-garnet" />}
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
             <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
             <circle cx="15" cy="7" r="2" />

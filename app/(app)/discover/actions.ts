@@ -1,11 +1,13 @@
 "use server";
 
 import { placeLabel } from "@/lib/places";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { findProfiles, type Search } from "./search";
+import { FILTER_KEYS, SEARCH_COOKIE, SORTS, findProfiles, type Search } from "./search";
 
 export async function toggleLike(formData: FormData) {
   const target = z.string().uuid().parse(formData.get("profile_id"));
@@ -20,6 +22,29 @@ export async function toggleLike(formData: FormData) {
   // Row-level security rejects blocked pairs and likes from anyone but the signed-in member.
   if (liked) await supabase.from("likes").delete().eq("from_user", user.id).eq("to_user", target);
   else await supabase.from("likes").insert({ from_user: user.id, to_user: target });
+}
+
+// Saves the search form on this device, so the next visit starts from the same filters.
+export async function applyFilters(formData: FormData) {
+  const q = new URLSearchParams();
+  for (const key of FILTER_KEYS) {
+    for (const value of formData.getAll(key)) if (typeof value === "string" && value) q.append(key, value);
+  }
+  const saved = q.toString();
+  const jar = await cookies();
+  if (saved && saved.length < 1500) {
+    jar.set(SEARCH_COOKIE, saved, { maxAge: 60 * 60 * 24 * 365, path: "/", httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
+  } else {
+    jar.delete(SEARCH_COOKIE);
+  }
+  const sort = SORTS.find((o) => o.value === formData.get("sort"))?.value;
+  redirect(sort && sort !== "nearest" ? `/discover?sort=${sort}` : "/discover");
+}
+
+// Back to the defaults. This is the only thing that clears saved filters.
+export async function resetFilters() {
+  (await cookies()).delete(SEARCH_COOKIE);
+  redirect("/discover/filters");
 }
 
 // Infinite scroll: the results list asks for the next page of the same search.
