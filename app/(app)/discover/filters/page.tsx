@@ -15,6 +15,8 @@ import {
   RELATIONSHIP_STATUSES,
 } from "@/lib/profile-options";
 import { placeLabel } from "@/lib/places";
+import { Toast } from "@/components/toast";
+import { SavedPicker } from "./saved-picker";
 import { AreaField } from "../area-field";
 import { MultiSelect } from "../multi-select";
 import { DualRangeField, RangeField } from "../sliders";
@@ -89,28 +91,15 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
         <Link href={`/discover?${sp.sort ? `sort=${f.sort}` : ""}`} className="btn btn-quiet">Back</Link>
       </div>
 
-      <div aria-live="polite">{note && <p role="status" className="mt-4 rounded-xl border border-line px-4 py-3 text-sm">{note}</p>}</div>
+      <Toast key={String(params.t ?? "")} message={note} tone={params.saved === "ok" || params.saved === "deleted" ? "info" : "error"} cleanPath="/discover/filters" />
 
       {saved && saved.length > 0 && (
-        <section aria-label="Saved searches" className="mt-6">
-          <h2 className="display px-1 text-2xl">Saved searches</h2>
-          <ul className="mt-3 divide-y divide-line rounded-2xl border border-line">
-            {saved.map((s) => (
-              <li key={s.id} data-saved={s.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{s.name}</p>
-                  <p className="text-xs text-dusk">{describe(s.query, areas)}</p>
-                </div>
-                <form className="flex items-center gap-2">
-                  <input type="hidden" name="id" value={s.id} />
-                  <button formAction={openSavedSearch} className="btn btn-primary !px-4 !py-2 text-sm">Search</button>
-                  <button formAction={editSavedSearch} className="btn btn-quiet !px-4 !py-2 text-sm">Edit</button>
-                  <button formAction={deleteSavedSearch} aria-label={`Delete saved search ${s.name}`} className="btn btn-quiet !px-3 !py-2 text-sm">Delete</button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <SavedPicker
+          items={saved.map((s) => ({ id: s.id, name: s.name, summary: describe(s.query, areas) }))}
+          open={openSavedSearch}
+          edit={editSavedSearch}
+          remove={deleteSavedSearch}
+        />
       )}
 
       <form key={JSON.stringify(sp)} action={applyFilters} aria-label="Search" className="mt-6 space-y-8">

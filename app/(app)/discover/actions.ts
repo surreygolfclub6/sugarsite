@@ -65,9 +65,9 @@ export async function saveSearch(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const name = z.string().trim().min(1).max(40).safeParse(formData.get("search_name"));
-  if (!name.success) redirect("/discover/filters?saved=name");
+  if (!name.success) redirect(`/discover/filters?saved=name&t=${Date.now()}`);
   const query = queryFrom(formData);
-  if (query.length > 1500) redirect("/discover/filters?saved=error");
+  if (query.length > 1500) redirect(`/discover/filters?saved=error&t=${Date.now()}`);
   const sort = SORTS.find((o) => o.value === formData.get("sort"))?.value ?? "nearest";
 
   const { data: existing } = await supabase.from("saved_searches").select("id, name");
@@ -75,9 +75,9 @@ export async function saveSearch(formData: FormData) {
   const { error } = same
     ? await supabase.from("saved_searches").update({ name: name.data, query, sort }).eq("id", same.id)
     : await supabase.from("saved_searches").insert({ user_id: user.id, name: name.data, query, sort });
-  if (error) redirect(`/discover/filters?saved=${error.message.includes("up to 20") ? "limit" : "error"}`);
+  if (error) redirect(`/discover/filters?saved=${error.message.includes("up to 20") ? "limit" : "error"}&t=${Date.now()}`);
   await remember(query);
-  redirect(`/discover/filters?saved=ok&name=${encodeURIComponent(name.data)}`);
+  redirect(`/discover/filters?saved=ok&name=${encodeURIComponent(name.data)}&t=${Date.now()}`);
 }
 
 // Brings a saved search back: straight to its results (openSavedSearch), or into the form to adjust first (editSavedSearch).
@@ -105,7 +105,7 @@ export async function deleteSavedSearch(formData: FormData) {
   const supabase = await createClient();
   const id = z.string().uuid().safeParse(formData.get("id"));
   if (id.success) await supabase.from("saved_searches").delete().eq("id", id.data);
-  redirect("/discover/filters?saved=deleted");
+  redirect(`/discover/filters?saved=deleted&t=${Date.now()}`);
 }
 
 // Back to the defaults. This is the only thing that clears saved filters.
