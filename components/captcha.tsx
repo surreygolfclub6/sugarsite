@@ -31,7 +31,8 @@ export function Captcha({ onReadyChange, resetKey }: { onReadyChange?: (ready: b
   }, []);
 
   useEffect(() => {
-    onReadyChange?.(!!token);
+    // With no site key there is no widget to solve, so the form is ready straight away (local development).
+    onReadyChange?.(!CAPTCHA_SITE_KEY || !!token);
   }, [token, onReadyChange]);
 
   useEffect(() => {

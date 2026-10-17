@@ -21,22 +21,37 @@
   --line-strong: #52394f;
   /* Text that sits on garnet buttons stays light in both themes. */
   --on-accent: #f2eadf;
+  /* Form controls: input fill and border, slider track and thumb. */
+  --field: var(--velvet);
+  --field-focus: var(--velvet-2);
+  --field-border: var(--line);
+  --track: var(--line);
+  --thumb: var(--pearl);
+  --thumb-shadow: none;
 }
 
 /* Light theme. Chosen under More, Appearance; the inline script in the root layout sets data-theme before
-   first paint so there is no flash. The same tokens, warm paper instead of claret night. */
+   first paint so there is no flash. The same tokens, white and soft grey instead of claret night. */
 :root[data-theme="light"] {
-  --night: #faf6ef;
-  --velvet: #ffffff;
-  --velvet-2: #efe6da;
-  --line: #e2d5c6;
-  --line-strong: #cdb9a3;
-  --pearl: #2a1d27;
-  --dusk: #6c5d67;
+  --night: #ffffff;
+  --velvet: #f6f4f3;
+  --velvet-2: #ece8e6;
+  --line: #e3dedc;
+  --line-strong: #6a5f66;
+  --pearl: #231a21;
+  --dusk: #6a5f66;
   --garnet: #b8405e;
   --garnet-deep: #8f2f48;
   --brass: #8a6420;
   --danger: #b3283d;
+  --on-accent: #ffffff;
+  /* Input borders and the slider track need to be visible against white (3:1 for borders). */
+  --field: #ffffff;
+  --field-focus: #ffffff;
+  --field-border: #948b91;
+  --track: #a9a1a6;
+  --thumb: #ffffff;
+  --thumb-shadow: 0 1px 3px rgba(35, 26, 33, 0.35);
 }
 
 @theme inline {
@@ -87,6 +102,12 @@ body {
   line-height: 1.7;
 }
 
+/* Native checkboxes and radio buttons take the brand red instead of the browser's default blue. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--garnet);
+}
+
 :focus-visible {
   outline: 2px solid var(--brass);
   outline-offset: 3px;
@@ -101,8 +122,8 @@ body {
 /* Form controls */
 .field {
   width: 100%;
-  background: var(--velvet);
-  border: 1px solid var(--line);
+  background: var(--field);
+  border: 1px solid var(--field-border);
   border-radius: 10px;
   padding: 0.8rem 0.95rem;
   color: var(--pearl);
@@ -117,7 +138,7 @@ body {
 .field:focus {
   outline: none;
   border-color: var(--brass);
-  background: var(--velvet-2);
+  background: var(--field-focus);
 }
 
 .btn {
@@ -193,7 +214,7 @@ body {
 .range-track {
   left: 0;
   right: 0;
-  background: var(--line);
+  background: var(--track);
 }
 .range-fill {
   background: var(--garnet);
@@ -215,8 +236,9 @@ body {
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-  background: var(--pearl);
+  background: var(--thumb);
   border: 2px solid var(--garnet);
+  box-shadow: var(--thumb-shadow);
   cursor: grab;
 }
 .range input[type="range"]::-moz-range-thumb {
@@ -224,8 +246,9 @@ body {
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-  background: var(--pearl);
+  background: var(--thumb);
   border: 2px solid var(--garnet);
+  box-shadow: var(--thumb-shadow);
   cursor: grab;
 }
 .range input[type="range"]:focus-visible::-webkit-slider-thumb {
