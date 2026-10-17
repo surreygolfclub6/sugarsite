@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/config";
 import { AgeBadge } from "@/components/age-badge";
+import { ProfileCarousel } from "@/components/profile-carousel";
 import { HomeImage } from "./home-image";
 import { FinalCta, HeaderActions, HeroActions } from "./home-session";
 
@@ -28,6 +29,56 @@ function Cross() {
     </svg>
   );
 }
+
+// Examples of how members describe themselves. Invented, and labelled as examples on the page. Drop a photo
+// named after the slug into public/images/home (for example profile-marcus.jpg) and it replaces the gradient.
+const exampleProfiles = [
+  {
+    slug: "marcus",
+    name: "Marcus",
+    age: 41,
+    city: "Manchester",
+    headline: "Founder, always between flights. Slow Sundays when I’m home.",
+    looking: "Someone independent and curious. Time together that suits two busy diaries, with no mixed signals.",
+    goals: ["Long-term", "Friendship"],
+  },
+  {
+    slug: "priya",
+    name: "Priya",
+    age: 34,
+    city: "Birmingham",
+    headline: "A surgeon who cooks better than she sleeps.",
+    looking: "Honesty up front. Dinners, theatre and the odd weekend away with someone who’s easy to talk to.",
+    goals: ["Long-term", "Casual dating"],
+  },
+  {
+    slug: "james",
+    name: "James",
+    age: 52,
+    city: "Edinburgh",
+    headline: "Recently single, quietly confident, better company than I look.",
+    looking: "Good conversation and companionship. Discretion on both sides, and clear expectations from day one.",
+    goals: ["Friendship", "Not sure yet"],
+  },
+  {
+    slug: "chloe",
+    name: "Chloe",
+    age: 27,
+    city: "Bristol",
+    headline: "Designer, paddleboarder, planner of far-too-many trips.",
+    looking: "Someone established and kind who knows what they want, and says so. I’d rather be direct than guess.",
+    goals: ["Casual dating", "Marriage minded"],
+  },
+  {
+    slug: "daniel",
+    name: "Daniel",
+    age: 46,
+    city: "London",
+    headline: "Restaurateur. Tasting menu or takeaway, I’m not fussy.",
+    looking: "A relationship with room for both our lives: generous with time, discreet, and fun to be around.",
+    goals: ["Long-term", "No strings attached"],
+  },
+];
 
 const steps = [
   {
@@ -199,6 +250,66 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Example profiles */}
+        <section id="profiles" className="border-t border-line">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
+            <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <h2 className="display max-w-[22ch] text-[clamp(2rem,5vw,3.4rem)]">Profiles that say what they want.</h2>
+              <p className="max-w-[40ch] text-dusk">
+                A few examples of how members describe themselves. Every profile has a space for what they’re looking for,
+                in their own words.
+              </p>
+            </div>
+
+            <ProfileCarousel label="Example profiles">
+              {exampleProfiles.map((p, i) => (
+                <li
+                  key={p.slug}
+                  className="flex w-[74%] min-w-[15.5rem] max-w-[18rem] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-line bg-velvet xl:w-auto xl:min-w-0 xl:max-w-none"
+                >
+                  <div className="relative">
+                    <HomeImage
+                      name={`profile-${p.slug}.jpg`}
+                      alt={`${p.name}, an example member`}
+                      sizes="(min-width: 1280px) 230px, 280px"
+                      tone={i + 1}
+                      initial={p.name.slice(0, 1)}
+                      className="aspect-[4/4.6]"
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: "linear-gradient(to top, rgba(22,15,24,0.9) 0%, rgba(22,15,24,0) 55%)" }}
+                    />
+                    <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-0.5 text-[11px] text-white/85 backdrop-blur">
+                      Example profile
+                    </span>
+                    <div className="absolute inset-x-4 bottom-3 text-white">
+                      <p className="display flex items-center gap-1.5 text-2xl">
+                        {p.name}, {p.age} <AgeBadge className="size-4" />
+                      </p>
+                      <p className="text-xs text-white/75">{p.city}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 flex-col gap-3 p-4">
+                    <p className="serif-body text-sm italic leading-relaxed text-pearl/90">“{p.headline}”</p>
+                    <div className="mt-auto border-t border-line pt-3">
+                      <p className="text-xs font-semibold text-brass">What I’m looking for</p>
+                      <p className="mt-1 text-sm text-dusk">{p.looking}</p>
+                      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Relationship goals">
+                        {p.goals.map((g) => (
+                          <li key={g} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-dusk">
+                            {g}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ProfileCarousel>
           </div>
         </section>
 
