@@ -16,9 +16,35 @@ export default function TermsPage() {
 
       <h2>Who can use {SITE_NAME}</h2>
       <ul>
-        <li>You must be 18 or over. We remove any profile we believe belongs to someone under 18.</li>
-        <li>You can have one account, and you must give accurate information about yourself, including your age.</li>
+        <li>You must be 18 or over, and you must pass our age check before your profile goes live (see “Age checks” below). We remove any profile we believe belongs to someone under 18.</li>
+        <li>You can have one account, and you must give accurate information about yourself, including your age. Each age check can be used for one account only.</li>
         <li>You are responsible for keeping your password safe and for what happens on your account.</li>
+      </ul>
+
+      <h2>Age checks</h2>
+      <ul>
+        <li>
+          Before your profile is visible, and before you can see other members, you must complete an age check. It is
+          carried out by AgeVerif, an independent age-checking service, using methods such as facial age estimation or
+          an identity document. You will be sent to AgeVerif to complete it, and you may be asked to repeat it.
+        </li>
+        <li>
+          You must not give false information, use someone else’s face, document or check, or try to avoid or bypass
+          the check. We may suspend or delete accounts that do.
+        </li>
+        <li>
+          If a check can’t confirm that you’re 18 or over, we can’t make your profile live. If you think the result is
+          wrong, contact us at {COMPANY.email}.
+        </li>
+        <li>
+          Members who pass the check show an “Age verified” badge. The badge means a check confirmed that the person is
+          an adult. It does not confirm who they are, and it is not a guarantee about their identity, intentions or
+          behaviour.
+        </li>
+        <li>
+          We keep only the result of your check, not your face image or documents. See our{" "}
+          <Link href="/privacy">Privacy Policy</Link> for details.
+        </li>
       </ul>
 
       <h2>What you can post</h2>
@@ -58,8 +84,8 @@ export default function TermsPage() {
 
       <h2>Meeting people</h2>
       <p>
-        We can’t check what people tell us about themselves and we don’t guarantee anyone’s identity, intentions or
-        behaviour. You are responsible for your own safety when you chat with or meet other members. See our{" "}
+        We can’t check everything people tell us about themselves, and our age check doesn’t confirm anyone’s identity. We don’t
+        guarantee anyone’s identity, intentions or behaviour. You are responsible for your own safety when you chat with or meet other members. See our{" "}
         <Link href="/safety">Safety guidance</Link>.
       </p>
 

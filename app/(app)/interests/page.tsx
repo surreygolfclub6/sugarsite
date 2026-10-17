@@ -40,7 +40,7 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
 
   // Row-level security drops members who are inactive or blocked, so they quietly disappear.
   const { data: profiles } = ids.length
-    ? await supabase.from("profiles").select("id, display_name, city, last_active_at").in("id", ids)
+    ? await supabase.from("profiles").select("id, display_name, city, last_active_at, age_verified").in("id", ids)
     : { data: [] };
   // Ages come from the database as numbers; members can't read each other's birthdates.
   const { data: ageRows } = ids.length ? await supabase.rpc("member_ages", { ids }) : { data: [] };
@@ -60,6 +60,7 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
         liked: likedByMe.has(id),
         photo_count: photos.get(id)?.count ?? 0,
         online: isOnline(p.last_active_at),
+        age_verified: p.age_verified,
         photo: photos.get(id)?.url ?? null,
       },
     ];

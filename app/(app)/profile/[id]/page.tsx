@@ -17,6 +17,7 @@ import {
   SEEKING,
   labelOf,
 } from "@/lib/profile-options";
+import { AgeBadge } from "@/components/age-badge";
 import { Gallery } from "./gallery";
 import { SafetyMenu } from "@/components/safety-menu";
 import { LikeFab, MessageBar } from "./profile-actions";
@@ -61,7 +62,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
     supabase
       .from("profiles")
       .select(
-        "id, display_name, city, headline, bio, looking_for, gender, seeking, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, last_active_at, created_at, id_verified, photo_verified",
+        "id, display_name, city, headline, bio, looking_for, gender, seeking, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, last_active_at, created_at, age_verified",
       )
       .eq("id", id)
       .single(),
@@ -95,7 +96,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
       <Gallery name={name} urls={urls} menu={own ? undefined : <SafetyMenu profileId={p.id} name={name} />} />
 
       <div className="px-1 pt-2">
-        <h1 className="display text-4xl">{name}{age !== undefined && `, ${age}`}</h1>
+        <h1 className="display text-4xl">{name}{age !== undefined && `, ${age}`}{p.age_verified && <> <AgeBadge className="inline size-6 align-middle" /></>}</h1>
       </div>
 
       <section aria-label="At a glance" className={`${card} grid grid-cols-2 divide-line [&>*:nth-child(odd)]:border-r [&>*:nth-child(odd)]:border-line`}>
@@ -149,15 +150,15 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
           </span>
         </div>
         <div className="pt-4">
-          <p>Verifications</p>
+          <p>Verification</p>
           <ul className="mt-3 flex gap-3 text-sm">
-            <li className={`rounded-full border px-3 py-1 ${p.photo_verified ? "border-brass text-brass" : "border-line text-dusk opacity-60"}`}>
-              Photo verified{p.photo_verified ? "" : ": not yet"}
-            </li>
-            <li className={`rounded-full border px-3 py-1 ${p.id_verified ? "border-brass text-brass" : "border-line text-dusk opacity-60"}`}>
-              ID verified{p.id_verified ? "" : ": not yet"}
+            <li className={`rounded-full border px-3 py-1 ${p.age_verified ? "border-brass text-brass" : "border-line text-dusk opacity-60"}`}>
+              {p.age_verified ? "Age verified" : "Age not verified"}
             </li>
           </ul>
+          <p className="mt-2 text-xs text-dusk">
+            {p.age_verified ? "This member passed an age check confirming they’re an adult. It doesn’t confirm who they are." : "This member joined before age checks were introduced."}
+          </p>
         </div>
       </section>
 

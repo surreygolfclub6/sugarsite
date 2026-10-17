@@ -13,6 +13,19 @@ export default function SafetyPage() {
         people while keeping yourself safe.
       </p>
 
+      <h2>Age checks and the badge</h2>
+      <ul>
+        <li>
+          Every new member has to pass an age check, run by AgeVerif, before their profile goes live. Members who pass
+          show an <strong>Age verified</strong> badge.
+        </li>
+        <li>
+          The badge means a check confirmed the person is an adult. It does <strong>not</strong> confirm who they are
+          or that what they tell you is true, so keep taking the usual care.
+        </li>
+        <li>Members who joined before age checks were introduced may not have the badge yet.</li>
+      </ul>
+
       <h2>Before you meet</h2>
       <ul>
         <li>Take your time. Chat on {SITE_NAME} for a while before sharing your number or social media.</li>

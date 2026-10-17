@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { AgeBadge } from "@/components/age-badge";
 import { SafetyMenu } from "@/components/safety-menu";
 import { createClient, realtimeReady } from "@/lib/supabase/client";
 import { loadEarlier, loadSince, markRead, sendMessage, type Message } from "../actions";
 
 type Msg = Message & { pending?: boolean };
-type Other = { id: string; name: string; photo: string | null; online: boolean };
+type Other = { id: string; name: string; photo: string | null; online: boolean; verified: boolean };
 
 const byTime = (a: Msg, b: Msg) =>
   a.pending === b.pending ? Date.parse(a.created_at) - Date.parse(b.created_at) : a.pending ? 1 : -1;
@@ -177,7 +178,7 @@ export function Thread({
               )}
             </span>
             <span className="min-w-0">
-              <span className="block truncate font-medium">{other.name}</span>
+              <span className="flex items-center gap-1.5 font-medium"><span className="truncate">{other.name}</span>{other.verified && <AgeBadge className="size-3.5" />}</span>
               {other.online && <span className="block text-xs text-emerald-400">Online now</span>}
             </span>
           </Link>

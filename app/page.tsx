@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/config";
+import { AgeBadge } from "@/components/age-badge";
 import { HomeImage } from "./home-image";
 import { FinalCta, HeaderActions, HeroActions } from "./home-session";
 
@@ -89,8 +90,16 @@ const faqs = [
     a: "Whatever two consenting adults agree on, as long as they say so openly. Some members want a traditional partner, others want something more flexible. The point is that you state it up front.",
   },
   {
+    q: "How does age verification work?",
+    a: "When you join, we send you to AgeVerif, an independent age-checking service, to confirm you’re 18 or over. Depending on what you choose it can estimate your age from a selfie or check an ID, and it usually takes about a minute. AgeVerif tells us only the result. We don’t see or keep your photo or ID. Until you pass, your profile stays hidden and you can’t see other members.",
+  },
+  {
+    q: "What does the Age verified badge mean?",
+    a: "It means a member passed an age check confirming they’re an adult. It doesn’t confirm who they are, so it’s one part of staying safe, not a guarantee. Our safety page explains how to take care when you chat and meet.",
+  },
+  {
     q: "How do you keep it safe?",
-    a: "Members must be 18 or over, every photo is reviewed by a person before it’s visible, and you can block or report anyone from any profile or chat. Reports go to real moderators.",
+    a: "Every member is age-verified, every photo is reviewed by a person before it’s visible, and you can block or report anyone from any profile or chat. Reports go to real moderators.",
   },
   {
     q: "Is anything off limits?",
@@ -112,6 +121,9 @@ export default function Home() {
         <nav className="flex items-center gap-2 sm:gap-3">
           <a href="#how" className="hidden px-3 text-sm text-dusk hover:text-pearl sm:block">
             How it works
+          </a>
+          <a href="#verified" className="hidden px-3 text-sm text-dusk hover:text-pearl md:block">
+            Age verified
           </a>
           <a href="#why" className="hidden px-3 text-sm text-dusk hover:text-pearl sm:block">
             Why {SITE_NAME}
@@ -139,7 +151,7 @@ export default function Home() {
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-dusk">
               <li className="flex items-center gap-2"><Check /> Free to join</li>
-              <li className="flex items-center gap-2"><Check /> No paywall on messaging</li>
+              <li className="flex items-center gap-2"><Check /> Every member age-verified</li>
               <li className="flex items-center gap-2"><Check /> Every photo reviewed</li>
             </ul>
             <p className="mt-5 text-sm text-dusk">18 and over only.</p>
@@ -215,7 +227,7 @@ export default function Home() {
                 <ul className="mt-4 space-y-3 text-dusk">
                   <li className="flex gap-3"><Cross /> Pay to read or answer a message</li>
                   <li className="flex gap-3"><Cross /> Vague profiles and mixed signals</li>
-                  <li className="flex gap-3"><Cross /> Fake photos and spam accounts</li>
+                  <li className="flex gap-3"><Cross /> Fake photos, spam accounts and no age checks</li>
                   <li className="flex gap-3"><Cross /> A subscription you have to remember to cancel</li>
                 </ul>
               </div>
@@ -224,10 +236,54 @@ export default function Home() {
                 <ul className="mt-4 space-y-3">
                   <li className="flex gap-3"><Tick /> Free to join and start conversations</li>
                   <li className="flex gap-3"><Tick /> Profiles that state what you want</li>
-                  <li className="flex gap-3"><Tick /> Every photo reviewed by a person</li>
+                  <li className="flex gap-3"><Tick /> Every member age-verified, every photo reviewed</li>
                   <li className="flex gap-3"><Tick /> No card needed, nothing to cancel</li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Age verification */}
+        <section id="verified" className="border-t border-line">
+          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+            <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-20">
+              <div>
+                <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-brass">
+                  <AgeBadge className="size-5" /> Age verified
+                </p>
+                <h2 className="display text-[clamp(2rem,5vw,3.4rem)]">Every member is checked to be an adult.</h2>
+                <p className="serif-body mt-6 text-lg text-dusk">
+                  Before a profile goes live, each member passes an independent age check run by AgeVerif. It takes about
+                  a minute, and it can estimate your age from a selfie or check an ID.
+                </p>
+                <p className="serif-body mt-4 text-lg text-dusk">
+                  Until someone has passed, their profile stays hidden and they can’t see anyone else. Members who pass
+                  show the badge on their profile and in search.
+                </p>
+              </div>
+
+              <ul className="space-y-4">
+                <li className="rounded-[18px] border border-line p-6">
+                  <h3 className="display text-2xl">Quick, and kept private</h3>
+                  <p className="mt-2 text-dusk">
+                    AgeVerif tells us only the result. We never see or keep your photo or ID.
+                  </p>
+                </li>
+                <li className="rounded-[18px] border border-line p-6">
+                  <h3 className="display text-2xl">One check, one account</h3>
+                  <p className="mt-2 text-dusk">
+                    A single age check can only back one profile, which makes it much harder to run fake or duplicate accounts.
+                  </p>
+                </li>
+                <li className="rounded-[18px] border border-line p-6">
+                  <h3 className="display text-2xl">An honest badge</h3>
+                  <p className="mt-2 text-dusk">
+                    It confirms a member is an adult, not who they are, so it’s one part of staying safe. Read our{" "}
+                    <Link href="/safety" className="text-pearl underline underline-offset-2">safety tips</Link>.
+                  </p>
+                </li>
+              </ul>
             </div>
           </div>
         </section>

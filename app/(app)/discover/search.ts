@@ -22,6 +22,7 @@ export type Card = {
   liked: boolean;
   photo_count: number;
   online: boolean;
+  age_verified: boolean;
   photo: string | null;
 };
 

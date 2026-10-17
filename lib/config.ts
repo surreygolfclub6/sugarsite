@@ -12,9 +12,9 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:30
 
 // Legal pages. Fill in the placeholders and set LEGAL_DRAFT to false once a solicitor has reviewed the text.
 export const LEGAL_DRAFT = true;
-export const LEGAL_UPDATED = "15 October 2026";
+export const LEGAL_UPDATED = "17 October 2026";
 // Bump when the Terms or Privacy Policy change in a way members must agree to again.
-export const CONSENT_VERSION = "2026-10-15";
+export const CONSENT_VERSION = "2026-10-17";
 export const COMPANY = {
   name: "[Company name]",
   address: "[Registered address]",

@@ -57,6 +57,6 @@ export async function GET(request: NextRequest) {
     return done(back(saveError.code === "23505" ? "used" : "unavailable"));
   }
 
-  await admin.from("profiles").update({ status: "active" }).eq("id", user.id).eq("status", "pending_review");
+  await admin.from("profiles").update({ status: "active", age_verified: true }).eq("id", user.id).eq("status", "pending_review");
   return done(NextResponse.redirect(`${origin}/discover`));
 }

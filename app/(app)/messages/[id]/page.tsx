@@ -31,7 +31,7 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
   const otherId = conversation.user_a === user.id ? conversation.user_b : conversation.user_a;
 
   // The other member is hidden by RLS if they're suspended or blocked, which ends the conversation.
-  const { data: other } = await supabase.from("profiles").select("id, display_name, last_active_at").eq("id", otherId).single();
+  const { data: other } = await supabase.from("profiles").select("id, display_name, last_active_at, age_verified").eq("id", otherId).single();
   if (!other) notFound();
 
   const { data: latest } = await supabase
@@ -47,7 +47,7 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
     <Thread
       conversationId={id}
       meId={user.id}
-      other={{ id: other.id, name: other.display_name ?? "Member", photo, online: isOnline(other.last_active_at) }}
+      other={{ id: other.id, name: other.display_name ?? "Member", photo, online: isOnline(other.last_active_at), verified: other.age_verified }}
       initial={rows.slice(0, PAGE).reverse()}
       hasEarlier={rows.length > PAGE}
     />

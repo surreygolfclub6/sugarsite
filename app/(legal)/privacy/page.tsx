@@ -25,6 +25,11 @@ export default function PrivacyPage() {
           <strong>Photos:</strong> the photos you upload. We re-encode them in your browser, which removes hidden data
           such as GPS location, before they leave your device.
         </li>
+        <li>
+          <strong>Age check:</strong> the result of your age check with AgeVerif: that you passed, the age threshold and
+          assurance level it reached, your country, a reference for the check, and when it was done and when it expires.
+          We do not receive or keep your face image or identity documents.
+        </li>
         <li><strong>Activity:</strong> your likes, the people you block, reports you make, your messages, and when you were last active.</li>
         <li>
           <strong>Technical:</strong> basic information needed to run and secure the service, such as your IP address
@@ -60,7 +65,8 @@ export default function PrivacyPage() {
       <h2>Why we use it, and our legal basis</h2>
       <ul>
         <li>To provide the service you asked for: creating your profile, showing you to and finding other members, and messaging (contract).</li>
-        <li>To keep members safe: reviewing photos, handling reports, preventing fraud and under-18s (our legitimate interests, and legal duties).</li>
+        <li>To keep members safe: reviewing photos, handling reports and preventing fraud (our legitimate interests, and legal duties).</li>
+        <li>To check that members are adults, and keep under-18s off the service, using an age check (our legal obligations under the Online Safety Act, and our legitimate interests).</li>
         <li>To meet legal obligations, and to deal with legal claims (legal obligation, legitimate interests).</li>
         <li>For special category data, your explicit consent.</li>
       </ul>
@@ -68,7 +74,10 @@ export default function PrivacyPage() {
 
       <h2>Who sees your data</h2>
       <ul>
-        <li><strong>Other members</strong> see your profile and photos once photos are approved. Your messages are visible only to you and the person you’re writing to.</li>
+        <li>
+          <strong>Other members</strong> see your profile and photos once photos are approved, and an “Age verified”
+          badge if you passed the age check. Your messages are visible only to you and the person you’re writing to.
+        </li>
         <li>
           <strong>Our moderators</strong> see photos before they’re approved, and may read the conversation attached to a
           report when you or someone else reports it.
@@ -79,6 +88,13 @@ export default function PrivacyPage() {
           ([hosting provider] and [email provider]).
         </li>
         <li>
+          <strong>AgeVerif</strong>, our age-checking provider. When you choose to verify your age you are sent to
+          AgeVerif, which carries out the check (for example by estimating your age from a photo or checking a document)
+          under its own privacy notice, and tells us the result. We don’t see or keep the image or document.
+          [Solicitor to confirm whether AgeVerif acts as our processor or as an independent controller for the check, and
+          whether facial age estimation involves special category (biometric) data.]
+        </li>
+        <li>
           <strong>Authorities</strong>, where the law requires it or to protect someone from serious harm.
         </li>
       </ul>
@@ -86,8 +102,9 @@ export default function PrivacyPage() {
 
       <h2>How long we keep it</h2>
       <p>
-        We keep your data while you have an account. When you delete your account we delete your profile, photos,
-        messages, likes and blocks straight away, along with any reports you made or that were made about you. Backups
+        We keep your data while you have an account, including the result of your age check. When you delete your account
+        we delete your profile, photos, messages, likes, blocks and age-check result straight away, along with any reports
+        you made or that were made about you. How long AgeVerif keeps data is set out in its own privacy notice. Backups
         and logs are removed on a rolling basis. [A solicitor may advise keeping reports for a limited period for safety
         and legal reasons.]
       </p>
@@ -113,8 +130,8 @@ export default function PrivacyPage() {
 
       <h2>Children</h2>
       <p>
-        {SITE_NAME} is only for people aged 18 or over. If we learn that someone under 18 has an account we will
-        delete it. See our <Link href="/terms">Terms</Link> and <Link href="/safety">Safety guidance</Link>.
+        {SITE_NAME} is only for people aged 18 or over, and every member must pass an age check before their profile goes
+        live. If we learn that someone under 18 has an account we will delete it. See our <Link href="/terms">Terms</Link> and <Link href="/safety">Safety guidance</Link>.
       </p>
     </>
   );
