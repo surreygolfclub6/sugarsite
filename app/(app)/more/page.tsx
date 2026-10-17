@@ -33,7 +33,7 @@ async function More() {
         <li><Link href="/more/levels" className={link}>Levels and invites</Link></li>
         <li><Link href="/more/profile" className={link}>Edit profile</Link></li>
         <li><Link href="/photos" className={link}>Your photos</Link></li>
-        <li><Link href="/discover/filters" className={link}>Search filters</Link></li>
+        <li><Link href="/discover/filters" className={link}>Search filters and saved searches</Link></li>
         <li><Link href="/more/blocked" className={link}>Blocked members</Link></li>
         <li><Link href="/more/account" className={link}>Account and security</Link></li>
         {isAdmin && <li><Link href="/admin" className={link}>Photo review (admin)</Link></li>}

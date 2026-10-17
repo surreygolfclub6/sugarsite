@@ -31,6 +31,7 @@ insert into admins (user_id) select id from auth.users where email = 'you@exampl
 - Demo members for testing: `node scripts/seed-profiles.mjs` creates 60 labelled demo profiles, `--remove` deletes them
 - Photo upload (1 to 6, re-encoded to JPEG in the browser to strip EXIF) and an admin photo-review queue at `/admin` (approve, reject with a reason, suspend). Members see rejections on `/discover` and can replace photos at `/photos`
 - Private photos: any photo can be marked private (`photos.visibility`). Private photos are hidden from the profile gallery, search and tiles, and visible only to the owner, moderators and members the owner shares with (`photo_shares`, only with conversation partners or matches). Moderators review every photo, and any approved photo counts for levels. Strangers see only a "N private photos" note
+- Saved searches: name the current filters on `/discover/filters` (up to 20, `saved_searches`, private to the member), then Search, Edit or Delete them from the list. Saving under an existing name replaces it
 - Schema: profiles, photos, likes, blocks, reports, conversations, messages, admins
 - Row-level security on every table, including blocked-user rules
 - Entitlements and a `paywall_enabled` flag. While the flag is false every entitlement check passes, so turning on subscriptions later is a data change, not a rewrite

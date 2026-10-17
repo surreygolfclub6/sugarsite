@@ -18,14 +18,40 @@ import { placeLabel } from "@/lib/places";
 import { AreaField } from "../area-field";
 import { MultiSelect } from "../multi-select";
 import { DualRangeField, RangeField } from "../sliders";
-import { applyFilters, resetFilters } from "../actions";
+import { applyFilters, deleteSavedSearch, editSavedSearch, openSavedSearch, resetFilters, saveSearch } from "../actions";
 import { ANYWHERE, parseFilters, withSavedFilters, type Search } from "../search";
 
 export const metadata: Metadata = { title: "Search filters" };
 
+const SAVED_NOTES: Record<string, string> = {
+  name: "Give the search a name first.",
+  limit: "You can save up to 20 searches. Delete one to make room.",
+  error: "We couldn’t save that search. Please try again.",
+  deleted: "Search deleted.",
+};
+
+// A short description of a saved search, e.g. "Ages 25 to 40 · within 30 miles · near Oxford".
+function describe(query: string, areas: Map<number, string>) {
+  const q: Search = Object.create(null);
+  for (const [key, value] of new URLSearchParams(query)) {
+    const cur = q[key];
+    q[key] = cur === undefined ? value : Array.isArray(cur) ? [...cur, value] : [cur, value];
+  }
+  const f = parseFilters(q);
+  const parts = [];
+  if (f.ageMin > 18 || f.ageMax < 99) parts.push(`Ages ${f.ageMin} to ${f.ageMax}`);
+  parts.push(f.miles >= ANYWHERE ? "anywhere in the UK" : `within ${f.miles} miles`);
+  if (f.areaId) parts.push(`of ${areas.get(f.areaId) ?? "another area"}`);
+  if (f.heightMin > MIN_HEIGHT_CM || f.heightMax < MAX_HEIGHT_CM) parts.push(`${f.heightMin} to ${f.heightMax} cm`);
+  const extra = [f.goals, f.status, f.body, f.hair, f.ethnicity].filter((x) => x.length).length;
+  if (extra) parts.push(`${extra} more ${extra === 1 ? "filter" : "filters"}`);
+  return parts.join(" · ");
+}
+
 async function SearchContent({ searchParams }: { searchParams: Promise<Search> }) {
   await connection();
-  const sp = await withSavedFilters(await searchParams);
+  const params = await searchParams;
+  const sp = await withSavedFilters(params);
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,6 +65,12 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
     .single();
   const setup = setupPath(me?.status);
   if (!me || setup) redirect(setup ?? "/onboarding");
+
+  const { data: saved } = await supabase.from("saved_searches").select("id, name, query, sort").order("created_at", { ascending: false });
+  const areaIds = [...new Set((saved ?? []).map((s) => Number(new URLSearchParams(s.query).get("area"))).filter((n) => Number.isInteger(n) && n > 0))];
+  const { data: areaRows } = areaIds.length ? await supabase.from("uk_places").select("id, name, county, nation").in("id", areaIds) : { data: [] };
+  const areas = new Map((areaRows ?? []).map((a) => [a.id, placeLabel(a)]));
+  const note = params.saved === "ok" ? `Saved “${String(params.name ?? "").slice(0, 40)}”.` : SAVED_NOTES[String(params.saved)];
 
   const f = parseFilters(sp);
   const { data: area } = f.areaId
@@ -56,6 +88,30 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
         <h1 className="display text-4xl">Search filters</h1>
         <Link href={`/discover?${sp.sort ? `sort=${f.sort}` : ""}`} className="btn btn-quiet">Back</Link>
       </div>
+
+      <div aria-live="polite">{note && <p role="status" className="mt-4 rounded-xl border border-line px-4 py-3 text-sm">{note}</p>}</div>
+
+      {saved && saved.length > 0 && (
+        <section aria-label="Saved searches" className="mt-6">
+          <h2 className="display px-1 text-2xl">Saved searches</h2>
+          <ul className="mt-3 divide-y divide-line rounded-2xl border border-line">
+            {saved.map((s) => (
+              <li key={s.id} data-saved={s.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{s.name}</p>
+                  <p className="text-xs text-dusk">{describe(s.query, areas)}</p>
+                </div>
+                <form className="flex items-center gap-2">
+                  <input type="hidden" name="id" value={s.id} />
+                  <button formAction={openSavedSearch} className="btn btn-primary !px-4 !py-2 text-sm">Search</button>
+                  <button formAction={editSavedSearch} className="btn btn-quiet !px-4 !py-2 text-sm">Edit</button>
+                  <button formAction={deleteSavedSearch} aria-label={`Delete saved search ${s.name}`} className="btn btn-quiet !px-3 !py-2 text-sm">Delete</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <form key={JSON.stringify(sp)} action={applyFilters} aria-label="Search" className="mt-6 space-y-8">
         <input type="hidden" name="sort" value={f.sort} />
@@ -77,6 +133,15 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
         <div className="flex gap-3">
           <button className="btn btn-primary">Search</button>
           <button type="submit" formAction={resetFilters} className="btn btn-quiet">Reset</button>
+        </div>
+
+        <div className="rounded-2xl border border-line p-4">
+          <label htmlFor="search_name" className="text-sm font-medium">Save this search</label>
+          <p className="mt-1 text-xs text-dusk">Give it a name to come back to it later, for example “Oxford, 30 to 45”. You can keep up to 20.</p>
+          <div className="mt-3 flex gap-2">
+            <input id="search_name" name="search_name" maxLength={40} placeholder="Name this search" className="field min-w-0 flex-1" autoComplete="off" />
+            <button type="submit" formAction={saveSearch} className="btn btn-quiet">Save</button>
+          </div>
         </div>
       </form>
     </>
