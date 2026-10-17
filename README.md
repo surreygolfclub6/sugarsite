@@ -35,6 +35,15 @@ insert into admins (user_id) select id from auth.users where email = 'you@exampl
 - Entitlements and a `paywall_enabled` flag. While the flag is false every entitlement check passes, so turning on subscriptions later is a data change, not a rewrite
 - `start_conversation()` function that checks status, blocks, entitlement and a daily cap on new conversations
 
+## Age check
+
+New profiles wait in `pending_review` until the member passes an AgeVerif check (OAuth2: `app/age-check/*`, `lib/age-assurance.ts`).
+Set `AGEVERIF_CLIENT_ID` and `AGEVERIF_CLIENT_SECRET` (server-only) to turn it on; without them profiles go live straight away,
+which is what you want in local development. Register `<site>/age-check/callback` as the OAuth2 redirect URI in AgeVerif.
+The database enforces the gate too: a member who isn't live can't see other members, search, message or like (`is_active_member()`
+in the RLS policies). Only the outcome is stored (`age_checks`), and one verification can back one account.
+Confirm with AgeVerif which assurance level counts as highly effective for UK law and set `MIN_ASSURANCE` in `lib/age-assurance.ts`.
+
 ## Not built yet
 
 - Email or push notifications for new messages and likes, and custom SMTP (Supabase's built-in sender allows only a few emails an hour)

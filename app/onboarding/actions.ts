@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MIN_AGE } from "@/lib/config";
+import { ageCheckEnabled } from "@/lib/age-assurance";
 import { ONBOARDING_STEP_FIELDS } from "@/lib/profile-options";
 import { profileInput, profileSchema } from "@/lib/profile-schema";
 
@@ -99,13 +100,15 @@ export async function completeOnboarding(
     .eq("id", user.id);
   if (error) return { error: "We couldn’t save your profile. Please try again." };
 
-  // Status can't be changed by members, so move it forward server-side.
-  // Profiles go live immediately; only photos wait for review.
+  // Status can't be changed by members, so move it forward server-side. With age checks on, the profile
+  // waits (pending_review) until the member passes the check; otherwise it goes live immediately.
+  // Either way only photos wait for moderator review.
+  const checkAge = ageCheckEnabled();
   await admin
     .from("profiles")
-    .update({ status: "active" })
+    .update({ status: checkAge ? "pending_review" : "active" })
     .eq("id", user.id)
     .eq("status", "incomplete");
 
-  redirect("/discover");
+  redirect(checkAge ? "/age-check" : "/discover");
 }

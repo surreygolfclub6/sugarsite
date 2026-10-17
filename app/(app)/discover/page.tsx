@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { after, connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { setupPath } from "@/lib/member-status";
 import { touchActive } from "@/lib/activity";
 import { PlacePicker } from "@/app/onboarding/place-picker";
 import { SORTS, findProfiles, parseFilters, withSavedFilters, type Search } from "./search";
@@ -32,7 +33,8 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
   if (!user) redirect("/login");
 
   const { data: me } = await supabase.from("profiles").select("status, place_id").eq("id", user.id).single();
-  if (!me || me.status === "incomplete") redirect("/onboarding");
+  const setup = setupPath(me?.status);
+  if (!me || setup) redirect(setup ?? "/onboarding");
   // Recording activity is a write the page doesn't wait on, so it runs after the response is sent.
   after(() => touchActive(user.id));
 

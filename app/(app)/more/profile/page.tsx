@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { setupPath } from "@/lib/member-status";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { EditProfileForm } from "./edit-form";
 
@@ -22,7 +23,8 @@ async function Edit() {
     .select("status, display_name, gender, seeking, place_id, city, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, headline, bio, looking_for")
     .eq("id", user.id)
     .single();
-  if (!p || p.status === "incomplete") redirect("/onboarding");
+  const setup = setupPath(p?.status);
+  if (!p || setup) redirect(setup ?? "/onboarding");
 
   // Members can't read birthdates through the API, not even their own. The id comes from the verified session.
   const { data: own } = await createAdminClient().from("profiles").select("birthdate").eq("id", user.id).single();

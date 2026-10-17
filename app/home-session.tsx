@@ -11,11 +11,13 @@ const getMember = cache(async () => {
   } = await supabase.auth.getUser();
   if (!user) return null;
   const { data: profile } = await supabase.from("profiles").select("display_name, status").eq("id", user.id).single();
-  return { name: profile?.display_name ?? "", incomplete: !profile || profile.status === "incomplete" };
+  return { name: profile?.display_name ?? "", status: profile?.status ?? "incomplete" };
 });
 
-function appLink(member: { incomplete: boolean }) {
-  return member.incomplete ? { href: "/onboarding", label: "Finish your profile" } : { href: "/discover", label: "Open SugarMatch" };
+function appLink(member: { status: string }) {
+  if (member.status === "incomplete") return { href: "/onboarding", label: "Finish your profile" };
+  if (member.status === "pending_review") return { href: "/age-check", label: "Verify your age" };
+  return { href: "/discover", label: "Open SugarMatch" };
 }
 
 function HeaderSignedOut() {

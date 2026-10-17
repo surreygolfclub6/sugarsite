@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { setupPath } from "@/lib/member-status";
 import {
   BODY_TYPES,
   ETHNICITIES,
@@ -36,7 +37,8 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
     .select("status, place_id, city")
     .eq("id", user.id)
     .single();
-  if (!me || me.status === "incomplete") redirect("/onboarding");
+  const setup = setupPath(me?.status);
+  if (!me || setup) redirect(setup ?? "/onboarding");
 
   const f = parseFilters(sp);
   const { data: area } = f.areaId

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { setupPath } from "@/lib/member-status";
 import { PhotoStep } from "@/app/onboarding/photo-step";
 
 export const metadata: Metadata = { title: "Your photos" };
@@ -17,7 +18,8 @@ async function PhotosContent() {
   if (!user) redirect("/login");
 
   const { data: me } = await supabase.from("profiles").select("status").eq("id", user.id).single();
-  if (!me || me.status === "incomplete") redirect("/onboarding");
+  const setup = setupPath(me?.status);
+  if (!me || setup) redirect(setup ?? "/onboarding");
 
   const { data: rows } = await supabase
     .from("photos")
