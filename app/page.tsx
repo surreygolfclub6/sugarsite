@@ -405,7 +405,7 @@ export default function Home() {
             <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-[60ch] text-dusk">
                 Replying to someone who messages you is always unlimited, and so is messaging a match: two members who like
-                each other. Every member also gets a personal invite link. Friends who join and become real members are what move you up: 1 for Member, 3 for Trusted and 10 for Champion, who have no daily limit.
+                each other. Every member also gets a personal invite link. Friends who join and become real members are what move you up: 1 for Member, 3 for Trusted and 10 for Champion.
               </p>
               <Link href="/levels" className="btn btn-quiet shrink-0">See how levels work</Link>
             </div>
