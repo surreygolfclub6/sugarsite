@@ -38,7 +38,7 @@ export function SafetyMenu({ profileId, name, conversationId }: Props) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="grid size-11 place-items-center rounded-full bg-black/60 backdrop-blur"
+        className="grid size-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
       >
         <svg viewBox="0 0 24 24" className="size-6" fill="currentColor" aria-hidden>
           <circle cx="5" cy="12" r="2" />

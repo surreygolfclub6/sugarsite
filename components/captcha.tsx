@@ -50,7 +50,7 @@ export function Captcha({ onReadyChange, resetKey }: { onReadyChange?: (ready: b
         <HCaptcha
           ref={widget}
           sitekey={CAPTCHA_SITE_KEY}
-          theme="dark"
+          theme={document.documentElement.dataset.theme === "light" ? "light" : "dark"}
           onVerify={setToken}
           onExpire={() => setToken("")}
           onError={() => setToken("")}

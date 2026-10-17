@@ -18,6 +18,25 @@
   --garnet-deep: #8f2f48;
   --brass: #c8a56b;
   --danger: #e0707f;
+  --line-strong: #52394f;
+  /* Text that sits on garnet buttons stays light in both themes. */
+  --on-accent: #f2eadf;
+}
+
+/* Light theme. Chosen under More, Appearance; the inline script in the root layout sets data-theme before
+   first paint so there is no flash. The same tokens, warm paper instead of claret night. */
+:root[data-theme="light"] {
+  --night: #faf6ef;
+  --velvet: #ffffff;
+  --velvet-2: #efe6da;
+  --line: #e2d5c6;
+  --line-strong: #cdb9a3;
+  --pearl: #2a1d27;
+  --dusk: #6c5d67;
+  --garnet: #b8405e;
+  --garnet-deep: #8f2f48;
+  --brass: #8a6420;
+  --danger: #b3283d;
 }
 
 @theme inline {
@@ -38,6 +57,9 @@
 html {
   background: var(--night);
   color-scheme: dark;
+}
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
@@ -73,7 +95,7 @@ body {
 
 ::selection {
   background: var(--garnet);
-  color: var(--pearl);
+  color: var(--on-accent);
 }
 
 /* Form controls */
@@ -90,7 +112,7 @@ body {
   color: color-mix(in srgb, var(--dusk) 70%, transparent);
 }
 .field:hover {
-  border-color: #52394f;
+  border-color: var(--line-strong);
 }
 .field:focus {
   outline: none;
@@ -114,7 +136,7 @@ body {
 }
 .btn-primary {
   background: var(--garnet);
-  color: var(--pearl);
+  color: var(--on-accent);
 }
 .btn-primary:hover {
   background: var(--garnet-deep);

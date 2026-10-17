@@ -175,13 +175,13 @@ export default function Home() {
                       "linear-gradient(to top, rgba(22,15,24,0.92) 0%, rgba(22,15,24,0) 55%)",
                   }}
                 />
-                <div className="absolute bottom-4 left-5 right-5">
+                <div className="absolute bottom-4 left-5 right-5 text-white">
                   <p className="display flex items-center gap-2 text-3xl">
                     Elena, 29 <Check />
                   </p>
-                  <p className="text-sm text-dusk">London</p>
+                  <p className="text-sm text-white/75">London</p>
                 </div>
-                <span className="absolute left-4 top-4 rounded-full bg-night/70 px-3 py-1 text-xs text-dusk backdrop-blur">
+                <span className="absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-xs text-white/85 backdrop-blur">
                   Example profile
                 </span>
               </div>

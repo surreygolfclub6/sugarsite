@@ -97,7 +97,7 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
             {p.moderation && (
               <span
                 data-status={p.moderation}
-                className={`absolute bottom-1.5 left-1.5 right-1.5 rounded-lg bg-black/75 px-2 py-1 text-xs ${p.moderation === "rejected" ? "text-danger" : ""}`}
+                className={`absolute bottom-1.5 left-1.5 right-1.5 rounded-lg bg-black/75 px-2 py-1 text-xs ${p.moderation === "rejected" ? "text-red-300" : "text-white"}`}
               >
                 {p.moderation === "pending" && "In review"}
                 {p.moderation === "approved" && "Live"}
@@ -108,7 +108,7 @@ export function PhotoStep({ userId, initial }: { userId: string; initial: Photo[
               type="button"
               onClick={() => remove(p)}
               aria-label={`Remove photo ${i + 1}`}
-              className="absolute right-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-black/70 text-sm"
+              className="absolute right-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-black/70 text-sm text-white"
             >
               ×
             </button>

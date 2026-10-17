@@ -74,20 +74,20 @@ export function TileGrid({
                 </div>
               )}
               {c.photo_count > 0 && (
-                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs" aria-label={`${c.photo_count} photos`}>
+                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs text-white" aria-label={`${c.photo_count} photos`}>
                   <svg viewBox="0 0 24 24" className="size-3.5" fill="currentColor" aria-hidden>
                     <path d="M9 4 7.6 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.6L15 4H9zm3 4.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z" />
                   </svg>
                   {c.photo_count}
                 </span>
               )}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10">
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-white">
                 <p className="flex items-center gap-1.5 font-medium">
                   {c.online && <span role="img" aria-label="Online now" className="size-2.5 shrink-0 rounded-full bg-emerald-500" />}
                   <span className="truncate">{c.display_name}</span>
                   {c.age_verified && <AgeBadge className="size-[18px]" />}
                 </p>
-                <p className="truncate text-xs text-pearl/80">
+                <p className="truncate text-xs text-white/80">
                   {c.age} · {c.city}
                 </p>
               </div>

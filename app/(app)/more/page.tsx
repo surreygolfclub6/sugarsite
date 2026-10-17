@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";
+import { ThemeSetting } from "@/components/theme-setting";
 
 export const metadata: Metadata = { title: "More" };
 
@@ -28,6 +29,9 @@ async function More() {
         <li><Link href="/more/blocked" className={link}>Blocked members</Link></li>
         <li><Link href="/more/account" className={link}>Account and security</Link></li>
         {isAdmin && <li><Link href="/admin" className={link}>Photo review (admin)</Link></li>}
+        <li className="rounded-xl border border-line px-4 py-4">
+          <ThemeSetting />
+        </li>
         <li>
           <form action={signOut}>
             <button className={`${link} w-full text-left`}>Sign out</button>

@@ -48,7 +48,7 @@ export function Gallery({ name, urls, menu }: { name: string; urls: string[]; me
         type="button"
         aria-label="Back"
         onClick={() => (window.history.length > 1 ? router.back() : router.push("/discover"))}
-        className="absolute left-3 top-3 grid size-11 place-items-center rounded-full bg-black/60 backdrop-blur"
+        className="absolute left-3 top-3 grid size-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
       >
         <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M19 12H5m6-7-7 7 7 7" />
