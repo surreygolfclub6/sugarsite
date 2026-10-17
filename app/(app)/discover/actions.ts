@@ -49,6 +49,8 @@ export async function resetFilters() {
 
 // Infinite scroll: the results list asks for the next page of the same search.
 export async function loadMoreProfiles(query: string, page: number) {
+  // The query is built by our own page; anything oversized is not.
+  if (typeof query !== "string" || query.length > 2000) return { cards: [], hasNext: false };
   const sp: Search = Object.create(null);
   for (const [key, value] of new URLSearchParams(query)) {
     const current = sp[key];

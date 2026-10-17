@@ -37,7 +37,9 @@ export async function changePassword(_: AccountState, formData: FormData): Promi
 
   const { error } = await supabase.auth.updateUser({ password: next.data });
   if (error) return { error: error.message };
-  return { notice: "Your password has been changed." };
+  // Anyone else signed in to this account, on another device, is signed out.
+  await supabase.auth.signOut({ scope: "others" });
+  return { notice: "Your password has been changed. Other devices have been signed out." };
 }
 
 export async function deleteAccount(_: AccountState, formData: FormData): Promise<AccountState> {

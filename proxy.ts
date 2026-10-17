@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE_OPTIONS } from "@/lib/supabase/cookie-options";
 
 // Routes that need a signed-in member.
 const PROTECTED = ["/onboarding", "/age-check", "/discover", "/photos", "/profile", "/interests", "/more", "/messages", "/settings", "/admin"];
@@ -21,6 +22,7 @@ export default async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      cookieOptions: SESSION_COOKIE_OPTIONS,
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -29,7 +31,7 @@ export default async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            response.cookies.set(name, value, { ...options, ...SESSION_COOKIE_OPTIONS }),
           );
         },
       },

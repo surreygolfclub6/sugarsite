@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requestOrigin } from "@/lib/origin";
+import { safeLocalPath } from "@/lib/safe-path";
 
 // Handles the link in the confirmation email.
 export async function GET(request: NextRequest) {
@@ -11,8 +12,7 @@ export async function GET(request: NextRequest) {
   const jar = await cookies();
   const resetPending = jar.has("pw_reset");
   const fallback = resetPending ? "/reset-password" : "/onboarding";
-  const nextParam = searchParams.get("next") ?? fallback;
-  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : fallback;
+  const next = safeLocalPath(searchParams.get("next"), fallback);
 
   if (code) {
     const supabase = await createClient();

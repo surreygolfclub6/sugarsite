@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CONSENT_VERSION, SITE_URL } from "@/lib/config";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CAPTCHA_MESSAGE, captchaToken, isCaptchaError } from "@/lib/captcha";
+import { safeLocalPath } from "@/lib/safe-path";
 
 export type AuthState = { error?: string; notice?: string };
 
@@ -16,9 +17,8 @@ const credentials = z.object({
 });
 
 function safeNext(value: FormDataEntryValue | null) {
-  const next = typeof value === "string" ? value : "";
-  // Only allow same-site paths to avoid open redirects.
-  return next.startsWith("/") && !next.startsWith("//") ? next : "/discover";
+  // Only same-site paths, to avoid open redirects.
+  return safeLocalPath(value, "/discover");
 }
 
 export async function signUp(_: AuthState, formData: FormData): Promise<AuthState> {
@@ -140,5 +140,7 @@ export async function updatePassword(_: AuthState, formData: FormData): Promise<
 
   const { error } = await supabase.auth.updateUser({ password: password.data });
   if (error) return { error: error.message };
+  // Anyone else signed in to this account, on another device, is signed out.
+  await supabase.auth.signOut({ scope: "others" });
   redirect("/discover");
 }
