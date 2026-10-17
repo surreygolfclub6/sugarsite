@@ -69,7 +69,7 @@ async function Messages() {
                   <span className="flex items-center justify-between gap-2">
                     <span className={`truncate text-sm ${r.unread ? "text-pearl" : "text-dusk"}`}>
                       {r.last_from_me && "You: "}
-                      {r.last_body}
+                      {r.last_body || "Sent a photo"}
                     </span>
                     {r.unread > 0 && (
                       <span data-unread aria-label={`${r.unread} unread`} className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-garnet px-1.5 text-xs font-medium text-white">

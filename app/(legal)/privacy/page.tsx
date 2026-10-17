@@ -89,7 +89,7 @@ export default function PrivacyPage() {
           badge if you passed the age check. Your messages are visible only to you and the person you’re writing to.
         </li>
         <li>
-          <strong>Members you share with</strong> see your private photos, only for as long as you share them. You choose who, and can stop at any time, though they may already have seen or saved them. We record who you share with so we can show you and apply your choice.
+          <strong>The person you send a photo to</strong> in a conversation can see that photo there, even if it is a private one. <strong>Members you share with</strong> see your private photos, only for as long as you share them. You choose who, and can stop at any time, though they may already have seen or saved them. We record who you share with so we can show you and apply your choice.
         </li>
         <li>
           <strong>Our moderators</strong> see all photos, public and private, before they’re approved, and may read the conversation attached to a

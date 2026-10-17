@@ -6,9 +6,10 @@ import { AgeBadge } from "@/components/age-badge";
 import { SafetyMenu } from "@/components/safety-menu";
 import { SharePhotosButton } from "@/components/share-photos-button";
 import { createClient, realtimeReady } from "@/lib/supabase/client";
-import { loadEarlier, loadSince, markRead, sendMessage, type Message } from "../actions";
+import { loadEarlier, loadSince, markRead, photoUrl, sendMessage, type Message } from "../actions";
 
 type Msg = Message & { pending?: boolean };
+type MyPhoto = { id: string; url: string; private: boolean };
 type Other = { id: string; name: string; photo: string | null; online: boolean; verified: boolean };
 
 const byTime = (a: Msg, b: Msg) =>
@@ -36,6 +37,7 @@ export function Thread({
   meId,
   other,
   sharing,
+  myPhotos,
   initial,
   hasEarlier: initialHasEarlier,
 }: {
@@ -43,6 +45,7 @@ export function Thread({
   meId: string;
   other: Other;
   sharing: { canShare: boolean; shared: boolean };
+  myPhotos: MyPhoto[];
   initial: Message[];
   hasEarlier: boolean;
 }) {
@@ -51,6 +54,8 @@ export function Thread({
   const [hasEarlier, setHasEarlier] = useState(initialHasEarlier);
   const [text, setText] = useState("");
   const [error, setError] = useState<string>();
+  const [picking, setPicking] = useState(false);
+  const [attached, setAttached] = useState<MyPhoto>();
   const scroller = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
   const anchor = useRef<number | null>(null);
@@ -91,6 +96,9 @@ export function Thread({
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter }, (payload) => {
           const message = payload.new as Message;
           merge(message);
+          if (message.photo_id && message.sender_id !== meId) {
+            void photoUrl(conversationId, message.photo_id).then((url) => merge({ ...message, photo_url: url }));
+          }
           if (message.sender_id !== meId) read();
         })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter }, (payload) => {
@@ -137,17 +145,21 @@ export function Thread({
 
   async function send() {
     const body = text.trim();
-    if (!body) return;
+    const photo = attached;
+    if (!body && !photo) return;
     setError(undefined);
     setText("");
+    setAttached(undefined);
+    setPicking(false);
     stick.current = true;
-    const tmp: Msg = { id: `tmp-${++counter.current}`, sender_id: meId, body, created_at: new Date().toISOString(), read_at: null, pending: true };
+    const tmp: Msg = { id: `tmp-${++counter.current}`, sender_id: meId, body, created_at: new Date().toISOString(), read_at: null, photo_id: photo?.id ?? null, photo_url: photo?.url, pending: true };
     setMessages((cur) => [...cur, tmp]);
 
-    const result = await sendMessage(conversationId, body);
+    const result = await sendMessage(conversationId, body, photo?.id);
     if ("error" in result) {
       setMessages((cur) => cur.filter((m) => m.id !== tmp.id));
       setText(body);
+      setAttached(photo);
       setError(result.error);
       return;
     }
@@ -213,9 +225,21 @@ export function Thread({
             const mine = m.sender_id === meId;
             return (
               <div key={m.id} data-message={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
-                <p className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 ${mine ? "bg-garnet text-white" : "bg-velvet-2"} ${m.pending ? "opacity-60" : ""}`}>
-                  {m.body}
-                </p>
+                {m.photo_id && (
+                  m.photo_url ? (
+                    <a href={m.photo_url} target="_blank" rel="noopener noreferrer" className={`mb-1 block max-w-[70%] overflow-hidden rounded-2xl border border-line ${m.pending ? "opacity-60" : ""}`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={m.photo_url} alt={`Photo sent by ${mine ? "you" : other.name}`} className="max-h-80 w-full object-cover" />
+                    </a>
+                  ) : (
+                    <p className="mb-1 rounded-2xl border border-line px-3.5 py-2 text-sm text-dusk">Photo not available</p>
+                  )
+                )}
+                {m.body && (
+                  <p className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 ${mine ? "bg-garnet text-white" : "bg-velvet-2"} ${m.pending ? "opacity-60" : ""}`}>
+                    {m.body}
+                  </p>
+                )}
                 <span className="mt-0.5 px-1 text-xs text-dusk">
                   <Time iso={m.created_at} />
                   {mine && m.id === lastMine?.id && (
@@ -237,7 +261,44 @@ export function Thread({
       >
         <div className="mx-auto max-w-2xl">
           {error && <p role="alert" className="mb-2 text-sm text-danger">{error}</p>}
+          {picking && (
+            <div role="group" aria-label="Choose a photo to send" className="mb-3 rounded-2xl border border-line bg-velvet p-3">
+              {myPhotos.length === 0 ? (
+                <p className="text-sm text-dusk">You don’t have an approved photo yet. Add one on the <Link href="/photos" className="underline">Photos page</Link>.</p>
+              ) : (
+                <>
+                  <p className="text-sm text-dusk">Pick a photo from your gallery. {other.name} will be able to see it in this chat.</p>
+                  <ul className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                    {myPhotos.map((p) => (
+                      <li key={p.id} className="shrink-0">
+                        <button type="button" onClick={() => { setAttached(p); setPicking(false); }} aria-label={`Send ${p.private ? "private " : ""}photo`} className="relative block size-20 overflow-hidden rounded-xl border border-line hover:border-dusk">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={p.url} alt="" className="size-full object-cover" />
+                          {p.private && <span className="absolute left-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[10px] text-white">Private</span>}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          )}
+          {attached && (
+            <div className="mb-3 flex items-center gap-3 rounded-2xl border border-line p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={attached.url} alt="Photo to send" className="size-16 rounded-xl object-cover" />
+              <p className="min-w-0 flex-1 text-xs text-dusk">
+                {attached.private ? `This is a private photo. Sending it lets ${other.name} see it in this chat.` : `${other.name} will see this photo in the chat.`} Add a message if you like.
+              </p>
+              <button type="button" onClick={() => setAttached(undefined)} aria-label="Remove photo" className="grid size-8 place-items-center rounded-full hover:bg-velvet">×</button>
+            </div>
+          )}
           <div className="flex items-end gap-2">
+            <button type="button" onClick={() => setPicking((v) => !v)} aria-expanded={picking} aria-label="Attach a photo" className="grid size-12 shrink-0 place-items-center rounded-full border border-line hover:border-dusk">
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="1.5" /><path d="m21 16-5-5-8 8" />
+              </svg>
+            </button>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -253,7 +314,7 @@ export function Thread({
               rows={1}
               className="field max-h-36 min-h-[3rem] flex-1 resize-none [field-sizing:content]"
             />
-            <button type="submit" disabled={!text.trim()} className="btn btn-primary">Send</button>
+            <button type="submit" disabled={!text.trim() && !attached} className="btn btn-primary">Send</button>
           </div>
         </div>
       </form>

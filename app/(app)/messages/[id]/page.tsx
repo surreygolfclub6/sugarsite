@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
 import { isOnline } from "@/lib/people";
 import { firstPhotos } from "../../discover/search";
+import { withPhotoUrls } from "@/lib/chat-photos";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Thread } from "./thread";
 
 export const metadata: Metadata = { title: "Conversation" };
@@ -36,7 +38,7 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
 
   const { data: latest } = await supabase
     .from("messages")
-    .select("id, sender_id, body, created_at, read_at")
+    .select("id, sender_id, body, created_at, read_at, photo_id")
     .eq("conversation_id", id)
     .order("created_at", { ascending: false })
     .limit(PAGE + 1);
@@ -48,13 +50,31 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
     supabase.from("photo_shares").select("viewer_id").eq("owner_id", user.id).eq("viewer_id", otherId).maybeSingle(),
   ]);
 
+  const initial = await withPhotoUrls(supabase, rows.slice(0, PAGE).reverse());
+
+  // Your own approved photos, to pick from when you want to send one.
+  const { data: mine } = await supabase
+    .from("photos")
+    .select("id, storage_path, visibility")
+    .eq("user_id", user.id)
+    .eq("moderation", "approved")
+    .order("position");
+  const { data: mineSigned } = mine?.length
+    ? await createAdminClient().storage.from("photos").createSignedUrls(mine.map((p) => p.storage_path), 3600)
+    : { data: [] };
+  const myPhotos = (mine ?? []).flatMap((p) => {
+    const url = mineSigned?.find((s) => s.path === p.storage_path)?.signedUrl;
+    return url ? [{ id: p.id, url, private: p.visibility === "private" }] : [];
+  });
+
   return (
     <Thread
       conversationId={id}
       meId={user.id}
       sharing={{ canShare: (privateCount ?? 0) > 0, shared: Boolean(share) }}
       other={{ id: other.id, name: other.display_name ?? "Member", photo, online: isOnline(other.last_active_at), verified: other.age_verified }}
-      initial={rows.slice(0, PAGE).reverse()}
+      myPhotos={myPhotos}
+      initial={initial}
       hasEarlier={rows.length > PAGE}
     />
   );
