@@ -1,6 +1,7 @@
 import { Suspense, cache } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { MemberMenu, type MenuItem } from "@/components/member-menu";
 
 // The homepage is prerendered. These pieces read the session behind Suspense, so the page shell stays
 // static and fast; visitors who are signed out see the fallback (the signed-out buttons) and nothing changes.
@@ -33,18 +34,26 @@ function HeaderSignedOut() {
   );
 }
 
+// A member whose profile isn't live yet is pointed at the one step they still need; everyone else gets the main places.
+function menuItems(member: { status: string }): MenuItem[] {
+  if (member.status === "incomplete") return [{ href: "/onboarding", label: "Finish your profile", icon: "profile" }];
+  if (member.status === "pending_review") return [{ href: "/age-check", label: "Verify your age", icon: "shield" }];
+  return [
+    { href: "/discover", label: "Search", icon: "search" },
+    { href: "/messages", label: "Messages", icon: "messages" },
+    { href: "/interests", label: "Interests", icon: "heart" },
+  ];
+}
+
 async function HeaderSession() {
   const member = await getMember();
   if (!member) return <HeaderSignedOut />;
-  const { href, label } = appLink(member);
   const initial = (member.name.trim()[0] ?? "•").toUpperCase();
   return (
     <>
-      <Link href="/more" aria-label="Your account" className="flex size-9 items-center justify-center rounded-full border border-brass/60 bg-velvet text-sm font-semibold text-brass hover:border-brass">
+      <MemberMenu items={menuItems(member)} />
+      <Link href="/more" aria-label="Your profile and settings" title="Profile and settings" className="flex size-9 shrink-0 items-center justify-center rounded-full border border-brass/60 bg-velvet text-sm font-semibold text-brass hover:border-brass">
         {initial}
-      </Link>
-      <Link href={href} className="btn btn-primary !py-2 text-sm">
-        {label}
       </Link>
     </>
   );

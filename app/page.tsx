@@ -217,7 +217,7 @@ const faqs = [
 export default function Home() {
   return (
     <>
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
+      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-6 sm:px-8">
         <Link href="/" className="display text-2xl">
           {SITE_NAME}
         </Link>
@@ -272,7 +272,7 @@ export default function Home() {
 
         {/* Why: the price story, said gently */}
         <section id="why" className="border-t border-line bg-velvet/50">
-          <div className="mx-auto grid w-full max-w-6xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:gap-20">
+          <div className="mx-auto grid w-full max-w-7xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:gap-20">
             <div>
               <h2 className="display text-[clamp(2rem,5vw,3.4rem)]">
                 Honest dating shouldn’t come with a monthly bill.
@@ -314,7 +314,7 @@ export default function Home() {
 
         {/* Age verification */}
         <section id="verified" className="border-t border-line">
-          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
             <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-20">
               <div>
                 <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-brass">
@@ -358,7 +358,7 @@ export default function Home() {
 
         {/* How it works */}
         <section id="how" className="border-t border-line">
-          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
             <h2 className="display max-w-[18ch] text-[clamp(2rem,5vw,3.4rem)]">
               Three steps from hello to something real.
             </h2>
@@ -383,7 +383,7 @@ export default function Home() {
 
         {/* Features */}
         <section className="border-t border-line bg-velvet/50">
-          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
             <h2 className="display max-w-[20ch] text-[clamp(2rem,5vw,3.4rem)]">
               Built for people who value their time and their privacy.
             </h2>
@@ -418,7 +418,7 @@ export default function Home() {
 
         {/* Closing call to action */}
         <section className="border-t border-line">
-          <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8">
             <div className="relative isolate overflow-hidden rounded-[26px] border border-line">
               <HomeImage
                 name="cta.jpg"
@@ -444,7 +444,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-line">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-dusk sm:px-8 md:flex-row md:items-start md:justify-between">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-5 py-10 text-sm text-dusk sm:px-8 md:flex-row md:items-start md:justify-between">
           <p className="max-w-[60ch]">
             {SITE_NAME} is for adults aged 18 and over. We don’t allow, and will remove,
             anything that offers or requests sexual services for payment.
@@ -460,7 +460,7 @@ export default function Home() {
             <Link href="/safety" className="hover:text-pearl">Safety</Link>
           </nav>
         </div>
-        <p className="mx-auto w-full max-w-6xl px-5 pb-10 text-xs text-dusk sm:px-8">
+        <p className="mx-auto w-full max-w-7xl px-5 pb-10 text-xs text-dusk sm:px-8">
           Photos, cropped: “Couple enjoys a meal at a restaurant” and “A young couple sits closely on a wooden bench” by{" "}
           <a href="https://commons.wikimedia.org/wiki/File:Couple_enjoys_a_meal_at_a_restaurant_with_attentive_interaction.jpg" className="underline hover:text-pearl">Shixart1985</a>
           {" "}(<a href="https://creativecommons.org/licenses/by/2.0/" className="underline hover:text-pearl">CC BY 2.0</a>); “Walking together, Boulevard de Nantes subway, Cardiff” by{" "}
