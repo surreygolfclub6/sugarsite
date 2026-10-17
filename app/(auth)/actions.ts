@@ -56,11 +56,30 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
       .eq("id", data.user.id);
   }
 
-  // With email confirmation on, there's no session yet.
+  // With email confirmation on, there's no session yet. Remember the address (in a cookie, not the URL)
+  // so the "check your email" page can show it and offer to resend.
   if (!data.session) {
-    return { notice: "Check your inbox for a confirmation link to finish signing up." };
+    (await cookies()).set("signup_email", parsed.data.email, { maxAge: 3600, path: "/", httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
+    redirect("/check-email");
   }
   redirect("/onboarding");
+}
+
+export async function resendConfirmation(_: AuthState, formData: FormData): Promise<AuthState> {
+  const email = (await cookies()).get("signup_email")?.value;
+  if (!email) redirect("/signup");
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: `${SITE_URL}/auth/callback?next=/onboarding`, captchaToken: captchaToken(formData) },
+  });
+  if (isCaptchaError(error)) return { error: CAPTCHA_MESSAGE };
+  if (error?.code === "over_email_send_rate_limit" || error?.status === 429) {
+    return { error: "Too many requests. Please wait a few minutes before asking for another email." };
+  }
+  return { notice: "We’ve sent another email. It can take a few minutes to arrive." };
 }
 
 export async function signIn(_: AuthState, formData: FormData): Promise<AuthState> {
