@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // A copy of your own data. Everything is read as you, so row-level security keeps it to what's yours:
 // your profile, your photos' details, your likes and blocks, and conversations you're part of.
@@ -11,7 +12,8 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
   const [profile, photos, likesSent, likesReceived, blocks, conversations] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    // Birthdate and consent records aren't readable by members through the API, so read your own row server-side.
+    createAdminClient().from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("photos").select("id, storage_path, position, moderation, rejection_reason, created_at").eq("user_id", user.id).order("position"),
     supabase.from("likes").select("to_user, created_at").eq("from_user", user.id),
     supabase.from("likes").select("from_user, created_at").eq("to_user", user.id),

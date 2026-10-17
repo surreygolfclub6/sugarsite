@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { EditProfileForm } from "./edit-form";
 
 export const metadata: Metadata = { title: "Edit profile" };
@@ -16,8 +17,15 @@ async function Edit() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: p } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+  const { data: p } = await supabase
+    .from("profiles")
+    .select("status, display_name, gender, seeking, place_id, city, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, headline, bio, looking_for")
+    .eq("id", user.id)
+    .single();
   if (!p || p.status === "incomplete") redirect("/onboarding");
+
+  // Members can't read birthdates through the API, not even their own. The id comes from the verified session.
+  const { data: own } = await createAdminClient().from("profiles").select("birthdate").eq("id", user.id).single();
 
   return (
     <>
@@ -40,7 +48,7 @@ async function Edit() {
           headline: p.headline ?? "",
           bio: p.bio ?? "",
           looking_for: p.looking_for ?? "",
-          birthdate_label: new Date(`${p.birthdate}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }),
+          birthdate_label: new Date(`${own?.birthdate}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }),
         }}
       />
     </>

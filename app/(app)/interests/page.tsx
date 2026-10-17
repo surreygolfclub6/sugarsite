@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { touchActive } from "@/lib/activity";
-import { ageFrom, isOnline } from "@/lib/people";
+import { isOnline } from "@/lib/people";
 import { firstPhotos, type Card } from "../discover/search";
 import { TileGrid } from "../discover/tile-grid";
 
@@ -39,8 +39,11 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
 
   // Row-level security drops members who are inactive or blocked, so they quietly disappear.
   const { data: profiles } = ids.length
-    ? await supabase.from("profiles").select("id, display_name, birthdate, city, last_active_at").in("id", ids)
+    ? await supabase.from("profiles").select("id, display_name, city, last_active_at").in("id", ids)
     : { data: [] };
+  // Ages come from the database as numbers; members can't read each other's birthdates.
+  const { data: ageRows } = ids.length ? await supabase.rpc("member_ages", { ids }) : { data: [] };
+  const ages = new Map<string, number>((ageRows ?? []).map((r: { id: string; age: number }) => [r.id, r.age]));
   const photos = await firstPhotos(supabase, (profiles ?? []).map((p) => p.id));
 
   const cards: Card[] = ids.flatMap((id) => {
@@ -50,7 +53,7 @@ async function Interests({ searchParams }: { searchParams: Promise<{ tab?: strin
       {
         id,
         display_name: p.display_name ?? "",
-        age: ageFrom(p.birthdate),
+        age: ages.get(id) ?? 0,
         city: p.city ?? "",
         distance_miles: null,
         liked: likedByMe.has(id),

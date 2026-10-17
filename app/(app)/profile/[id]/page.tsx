@@ -6,7 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { touchActive } from "@/lib/activity";
-import { ageFrom, formatHeight, lastActiveText } from "@/lib/people";
+import { formatHeight, lastActiveText } from "@/lib/people";
 import {
   BODY_TYPES,
   ETHNICITIES,
@@ -58,11 +58,13 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
   const { data: p } = await supabase
     .from("profiles")
     .select(
-      "id, display_name, birthdate, city, headline, bio, looking_for, gender, seeking, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, last_active_at, created_at, id_verified, photo_verified",
+      "id, display_name, city, headline, bio, looking_for, gender, seeking, relationship_status, relationship_goals, height_cm, body_type, hair_colour, ethnicity, last_active_at, created_at, id_verified, photo_verified",
     )
     .eq("id", id)
     .single();
   if (!p) notFound();
+  const { data: ageRows } = await supabase.rpc("member_ages", { ids: [id] });
+  const age: number | undefined = ageRows?.[0]?.age;
 
   const { data: rows } = await supabase
     .from("photos")
@@ -97,7 +99,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
       <Gallery name={name} urls={urls} menu={own ? undefined : <SafetyMenu profileId={p.id} name={name} />} />
 
       <div className="px-1 pt-2">
-        <h1 className="display text-4xl">{name}, {ageFrom(p.birthdate)}</h1>
+        <h1 className="display text-4xl">{name}{age !== undefined && `, ${age}`}</h1>
       </div>
 
       <section aria-label="At a glance" className={`${card} grid grid-cols-2 divide-line [&>*:nth-child(odd)]:border-r [&>*:nth-child(odd)]:border-line`}>

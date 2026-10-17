@@ -24,7 +24,7 @@ export async function toggleLike(formData: FormData) {
 
 // Infinite scroll: the results list asks for the next page of the same search.
 export async function loadMoreProfiles(query: string, page: number) {
-  const sp: Search = {};
+  const sp: Search = Object.create(null);
   for (const [key, value] of new URLSearchParams(query)) {
     const current = sp[key];
     sp[key] = current === undefined ? value : Array.isArray(current) ? [...current, value] : [current, value];
