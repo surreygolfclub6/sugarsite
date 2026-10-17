@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/config";
 import { HomeImage } from "./home-image";
+import { FinalCta, HeaderActions, HeroActions } from "./home-session";
 
 function Check() {
   return (
@@ -115,12 +116,7 @@ export default function Home() {
           <a href="#why" className="hidden px-3 text-sm text-dusk hover:text-pearl sm:block">
             Why {SITE_NAME}
           </a>
-          <Link href="/login" className="btn btn-quiet !py-2 text-sm">
-            Sign in
-          </Link>
-          <Link href="/signup" className="btn btn-primary !py-2 text-sm">
-            Join free
-          </Link>
+          <HeaderActions />
         </nav>
       </header>
 
@@ -139,12 +135,7 @@ export default function Home() {
               a fortune just to send a message.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link href="/signup" className="btn btn-primary">
-                Create your free profile
-              </Link>
-              <a href="#how" className="btn btn-quiet">
-                See how it works
-              </a>
+              <HeroActions />
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-dusk">
               <li className="flex items-center gap-2"><Check /> Free to join</li>
@@ -320,9 +311,7 @@ export default function Home() {
                 <p className="serif-body mx-auto mt-5 max-w-[44ch] text-lg text-pearl/80">
                   Set up your profile in a few minutes. It’s free, and you decide who sees it.
                 </p>
-                <Link href="/signup" className="btn btn-primary mt-9">
-                  Create your free profile
-                </Link>
+                <FinalCta />
                 <p className="mt-4 text-sm text-pearl/70">18 and over only.</p>
               </div>
             </div>
