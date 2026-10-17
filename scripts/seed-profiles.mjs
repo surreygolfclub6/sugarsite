@@ -1,4 +1,4 @@
-// Creates labelled demo members so Discover has something to search.
+// Creates a handful of demo members, clearly labelled as test accounts (name starts with "Test", headline with "[Test account]"), so Discover has something to search.
 //   node scripts/seed-profiles.mjs            replace any existing demo members with a fresh set
 //   node scripts/seed-profiles.mjs --remove   delete every demo member (accounts, photos, files)
 // Demo accounts use @seed.ardor-test.dev emails with random passwords nobody knows.
@@ -12,7 +12,7 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUP
   auth: { persistSession: false, autoRefreshToken: false },
 });
 const DOMAIN = "seed.ardor-test.dev";
-const COUNT = 60;
+const COUNT = 10;
 
 // Deterministic, so reruns give the same people.
 let seed = 20261015;
@@ -159,7 +159,7 @@ for (let i = 0; i < COUNT; i++) {
   const { error: profileError } = await admin
     .from("profiles")
     .update({
-      display_name: name,
+      display_name: `Test ${name}`,
       birthdate,
       gender,
       seeking,
@@ -171,7 +171,7 @@ for (let i = 0; i < COUNT; i++) {
       body_type: pick(BODY),
       hair_colour: weighted([["brown", 5], ["blonde", 3], ["black", 3], ["red", 1], ["grey", age > 45 ? 3 : 0], ["white", age > 58 ? 2 : 0], ["bald", gender === "man" ? 1 : 0], ["other", 1]].filter(([, w]) => w > 0)),
       ethnicity: weighted(ETHNIC),
-      headline: pick(HEADLINES),
+      headline: `[Test account] ${pick(HEADLINES)}`.slice(0, 120),
       bio: pick(BIOS).replace("{job}", pick(JOBS)),
       looking_for: rand() < 0.7 ? pick(LOOKING) : null,
       status: "active",
