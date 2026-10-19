@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { COMPANY, SITE_NAME } from "@/lib/config";
 import { AgeBadge } from "@/components/age-badge";
@@ -6,6 +7,8 @@ import { LEVELS, isUnlimited, whatYouGet } from "@/lib/levels";
 import { ProfileCarousel } from "@/components/profile-carousel";
 import { HomeImage } from "./home-image";
 import { FinalCta, HeaderActions, HeroActions } from "./home-session";
+
+export const metadata: Metadata = { alternates: { canonical: "/" }, openGraph: { url: "/" } };
 
 function Check() {
   return (

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { COMPANY, SITE_NAME } from "@/lib/config";
 
-export const metadata: Metadata = { title: "Terms of use" };
+export const metadata: Metadata = { title: "Terms of use", description: "The terms for using SugarMatch." };
 
 export default function TermsPage() {
   return (

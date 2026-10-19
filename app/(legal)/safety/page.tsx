@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { COMPANY, SITE_NAME } from "@/lib/config";
 
-export const metadata: Metadata = { title: "Safety" };
+export const metadata: Metadata = { title: "Safety", description: "How SugarMatch keeps members safe: age checks, photos reviewed by a person, blocking and reporting, and tips for meeting people." };
 
 export default function SafetyPage() {
   return (

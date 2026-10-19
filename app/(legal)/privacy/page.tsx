@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { COMPANY, SITE_NAME } from "@/lib/config";
 
-export const metadata: Metadata = { title: "Privacy policy" };
+export const metadata: Metadata = { title: "Privacy policy", description: "How SugarMatch collects, uses and protects your data." };
 
 export default function PrivacyPage() {
   return (
