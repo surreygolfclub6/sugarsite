@@ -30,7 +30,7 @@ export async function sendWelcome(memberId: string) {
     ["Find people", "Search by age, distance and what people are looking for, and save searches you use often. We only ever show a rounded distance, never an exact location."],
     ["Say hello", "Like profiles to show interest. If they like you back it’s a match, and you can message each other freely. Replying to anyone who writes to you is always unlimited."],
     ["Your first week", `Your first week counts as ${member.label}, so you can start ${perDayText(member.conversationsPerDay)}. After that you start at ${newcomer.label} (${perDayText(newcomer.conversationsPerDay)}) and move up by completing your profile, having conversations and inviting friends.`],
-    ["Invite friends", "A friend counts once they’re a real member. 1 friend takes you to Member, 3 to Trusted and 10 to Champion, with no limit on new conversations."],
+    ["Invite friends", `A friend counts once they’re a real member. 1 friend takes you to Member (${member.conversationsPerDay} new conversations a day), 3 to Trusted (${LEVELS[2].conversationsPerDay}) and 10 to Champion (${LEVELS[3].conversationsPerDay}).`],
     ["Private photos", "Keep any photo private and share it only with people you choose, from the menu in a chat."],
     ["Stay in control", "You can block or report anyone from the menu on a profile or in a chat. Blocking is silent."],
   ];
