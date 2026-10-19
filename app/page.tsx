@@ -500,7 +500,9 @@ export default function Home() {
             <a href="https://www.geonames.org" className="underline hover:text-pearl">GeoNames</a>, licensed under{" "}
             <a href="https://creativecommons.org/licenses/by/4.0/" className="underline hover:text-pearl">CC BY 4.0</a>.
           </p>
-          <nav className="flex gap-5 md:shrink-0">
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 md:shrink-0">
+            <Link href="/how-it-works" className="hover:text-pearl">How it works</Link>
+            <Link href="/faq" className="hover:text-pearl">FAQ</Link>
             <Link href="/terms" className="hover:text-pearl">Terms</Link>
             <Link href="/privacy" className="hover:text-pearl">Privacy</Link>
             <Link href="/safety" className="hover:text-pearl">Safety</Link>
