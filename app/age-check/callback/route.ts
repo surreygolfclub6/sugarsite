@@ -1,9 +1,10 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { exchangeCode, expiryDate, fetchVerification, judge } from "@/lib/age-assurance";
 import { requestOrigin } from "@/lib/origin";
 import { approvalRequired } from "@/lib/approval";
+import { notifyAdminsNewMember } from "@/lib/admin-notify";
 
 // AgeVerif sends the member back here with ?code=&state=. The verdict is fetched server-to-server and only a
 // pass makes the profile live. Nothing from the browser is trusted except the one-time code.
@@ -65,5 +66,6 @@ export async function GET(request: NextRequest) {
     .update({ status: needsApproval ? "awaiting_approval" : "active", age_verified: true })
     .eq("id", user.id)
     .eq("status", "pending_review");
+  after(() => notifyAdminsNewMember(user.id).catch(() => {}));
   return done(NextResponse.redirect(`${origin}${needsApproval ? "/awaiting-approval" : "/discover"}`));
 }

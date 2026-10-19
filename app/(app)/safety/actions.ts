@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { REPORT_REASONS } from "@/lib/safety";
+import { notifyAdminsReport } from "@/lib/admin-notify";
 
 const uuid = z.string().uuid();
 
@@ -90,6 +92,7 @@ export async function reportMember(input: {
     return { error: "We couldn’t send your report. Please try again." };
   }
 
+  after(() => notifyAdminsReport(REPORT_REASONS.find((r) => r.value === reason)?.label ?? reason).catch(() => {}));
   if (alsoBlock) await addBlock(supabase, user.id, profileId);
   return { ok: true, blocked: alsoBlock };
 }

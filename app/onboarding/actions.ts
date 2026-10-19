@@ -2,12 +2,14 @@
 
 import { placeLabel } from "@/lib/places";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MIN_AGE } from "@/lib/config";
 import { ageCheckEnabled } from "@/lib/age-assurance";
 import { approvalRequired } from "@/lib/approval";
+import { notifyAdminsNewMember } from "@/lib/admin-notify";
 import { ONBOARDING_STEP_FIELDS } from "@/lib/profile-options";
 import { profileInput, profileSchema } from "@/lib/profile-schema";
 
@@ -113,6 +115,8 @@ export async function completeOnboarding(
     .update({ status: next })
     .eq("id", user.id)
     .eq("status", "incomplete");
+  // With an age check first, the moderators hear about them once they pass it.
+  if (!checkAge) after(() => notifyAdminsNewMember(user.id).catch(() => {}));
 
   redirect(checkAge ? "/age-check" : needsApproval ? "/awaiting-approval" : "/discover");
 }
