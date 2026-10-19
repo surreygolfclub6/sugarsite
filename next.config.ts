@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 
 // Supabase serves the photos (signed URLs) and the realtime socket; hCaptcha loads its widget from hcaptcha.com. Scripts and styles need
-// 'unsafe-inline' because Next.js injects inline bootstrap code; everything else is locked to this site.
+// 'unsafe-inline' because Next.js injects inline bootstrap code; everything else is locked to this site. A per-request nonce
+// (and strict-dynamic) would be stricter, but prerendered pages can't carry one: tried, and every script on them was flagged.
+// Violations are reported to /api/csp-report.
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
@@ -17,6 +19,8 @@ const csp = [
   "form-action 'self'",
   "object-src 'none'",
   "upgrade-insecure-requests",
+  "report-uri /api/csp-report",
+  "report-to csp",
 ].join("; ");
 
 const securityHeaders = [
@@ -25,6 +29,7 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Reporting-Endpoints", value: 'csp="/api/csp-report"' },
   // The dev server runs over plain http and needs eval for hot reloading, so only enforce this in production.
   ...(isProd ? [{ key: "Content-Security-Policy", value: csp }] : []),
 ];

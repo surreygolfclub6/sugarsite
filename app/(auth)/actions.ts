@@ -8,6 +8,7 @@ import { CONSENT_VERSION, SITE_URL } from "@/lib/config";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CAPTCHA_MESSAGE, captchaToken, isCaptchaError } from "@/lib/captcha";
 import { safeLocalPath } from "@/lib/safe-path";
+import { clearLoginFailures, loginWaitSeconds, recordLoginFailure, waitMessage } from "@/lib/login-limit";
 
 export type AuthState = { error?: string; notice?: string };
 
@@ -100,10 +101,17 @@ export async function signIn(_: AuthState, formData: FormData): Promise<AuthStat
     .safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
+  const wait = await loginWaitSeconds(parsed.data.email);
+  if (wait > 0) return { error: waitMessage(wait) };
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ ...parsed.data, options: { captchaToken: captchaToken(formData) } });
   if (isCaptchaError(error)) return { error: CAPTCHA_MESSAGE };
-  if (error) return { error: "Email or password is incorrect." };
+  if (error) {
+    await recordLoginFailure(parsed.data.email);
+    return { error: "Email or password is incorrect." };
+  }
+  await clearLoginFailures(parsed.data.email);
 
   redirect(safeNext(formData.get("next")));
 }

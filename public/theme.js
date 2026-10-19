@@ -1,0 +1,1 @@
+try{var t=localStorage.getItem("theme");var d=t==="dark"||(t==="system"&&!matchMedia("(prefers-color-scheme: light)").matches);document.documentElement.dataset.theme=d?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}

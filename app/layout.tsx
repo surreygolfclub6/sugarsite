@@ -13,11 +13,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         {/* Applies the saved theme before first paint. Light is the default. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("theme");var d=t==="dark"||(t==="system"&&!matchMedia("(prefers-color-scheme: light)").matches);document.documentElement.dataset.theme=d?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}`,
-          }}
-        />
+        <script src="/theme.js" />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
