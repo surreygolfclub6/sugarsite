@@ -5,12 +5,17 @@ import { exchangeCode, expiryDate, fetchVerification, judge } from "@/lib/age-as
 import { requestOrigin } from "@/lib/origin";
 import { approvalRequired } from "@/lib/approval";
 import { notifyAdminsNewMember } from "@/lib/admin-notify";
+import { logAgeEvent } from "@/lib/age-events";
 
 // AgeVerif sends the member back here with ?code=&state=. The verdict is fetched server-to-server and only a
 // pass makes the profile live. Nothing from the browser is trusted except the one-time code.
 export async function GET(request: NextRequest) {
   const origin = requestOrigin(request);
-  const back = (error: string) => NextResponse.redirect(`${origin}/age-check?error=${error}`);
+  // Logs why it didn't pass and hands the member a short reference to quote to support.
+  const back = async (error: string, userId?: string, detail?: Record<string, unknown>) => {
+    const ref = userId ? await logAgeEvent(userId, error, detail) : null;
+    return NextResponse.redirect(`${origin}/age-check?error=${error}${ref ? `&ref=${ref}` : ""}`);
+  };
   const { searchParams } = new URL(request.url);
 
   const supabase = await createClient();
@@ -26,19 +31,29 @@ export async function GET(request: NextRequest) {
   };
 
   const code = searchParams.get("code");
-  if (searchParams.get("error") || !code) return done(back("cancelled"));
-  if (!expected || searchParams.get("state") !== expected) return done(back("state"));
+  if (searchParams.get("error") || !code) return done(await back("cancelled", user.id, { provider_error: searchParams.get("error") }));
+  if (!expected || searchParams.get("state") !== expected) return done(await back("state", user.id, { cookie_present: !!expected }));
 
   let verification;
   try {
     verification = await fetchVerification(await exchangeCode(code));
   } catch (error) {
     console.error("Age check failed", error instanceof Error ? error.message : error);
-    return done(back("unavailable"));
+    return done(await back("unavailable", user.id, { error: error instanceof Error ? error.message : "unknown" }));
   }
 
   const verdict = judge(verification);
-  if (!verdict.ok) return done(back(verdict.reason));
+  if (!verdict.ok) {
+    return done(
+      await back(verdict.reason, user.id, {
+        verified: verification.verified,
+        assurance_level: verification.assurance_level,
+        age_threshold: verification.age_threshold,
+        country: verification.country,
+        expires_at: verification.expires_at,
+      }),
+    );
+  }
 
   const admin = createAdminClient();
   const { error: saveError } = await admin.from("age_checks").upsert(
@@ -56,7 +71,7 @@ export async function GET(request: NextRequest) {
   );
   if (saveError) {
     // 23505: this verification already backs another account.
-    return done(back(saveError.code === "23505" ? "used" : "unavailable"));
+    return done(await back(saveError.code === "23505" ? "used" : "unavailable", user.id, { code: saveError.code }));
   }
 
   // Passing the check makes the profile live, unless new members have to be approved first.
@@ -66,6 +81,7 @@ export async function GET(request: NextRequest) {
     .update({ status: needsApproval ? "awaiting_approval" : "active", age_verified: true })
     .eq("id", user.id)
     .eq("status", "pending_review");
+  await logAgeEvent(user.id, "passed", { assurance_level: verification.assurance_level, country: verification.country });
   after(() => notifyAdminsNewMember(user.id).catch(() => {}));
   return done(NextResponse.redirect(`${origin}${needsApproval ? "/awaiting-approval" : "/discover"}`));
 }

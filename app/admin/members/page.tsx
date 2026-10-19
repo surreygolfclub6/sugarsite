@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/admin";
 import { SITE_NAME } from "@/lib/config";
 import { AdminNav } from "../admin-nav";
 import { setTester } from "../actions";
+import { OUTCOME_LABELS } from "@/lib/age-events";
 
 export const metadata: Metadata = { title: "Members" };
 
@@ -52,8 +53,12 @@ async function Members({ searchParams }: { searchParams: Promise<Params> }) {
 
   const rows = await Promise.all(
     (members ?? []).map(async (m) => {
-      const [{ data: u }, { data: level }] = await Promise.all([admin.auth.admin.getUserById(m.id), admin.rpc("member_tier", { uid: m.id })]);
-      return { ...m, email: u.user?.email ?? "", level: (level as string | null) ?? "newcomer" };
+      const [{ data: u }, { data: level }, { data: checks }] = await Promise.all([
+        admin.auth.admin.getUserById(m.id),
+        admin.rpc("member_tier", { uid: m.id }),
+        m.status === "pending_review" ? admin.from("age_check_events").select("outcome, created_at").eq("user_id", m.id).order("created_at", { ascending: false }).limit(1) : Promise.resolve({ data: null }),
+      ]);
+      return { ...m, email: u.user?.email ?? "", level: (level as string | null) ?? "newcomer", lastCheck: checks?.[0] ?? null };
     }),
   );
   const pages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
@@ -121,7 +126,14 @@ async function Members({ searchParams }: { searchParams: Promise<Params> }) {
                   </p>
                   <p className="break-all text-xs text-dusk">{m.email}</p>
                 </td>
-                <td className="px-4 py-3">{STATUS_LABEL[m.status] ?? m.status}</td>
+                <td className="px-4 py-3">
+                  {STATUS_LABEL[m.status] ?? m.status}
+                  {m.status === "pending_review" && (
+                    <p className="text-xs text-dusk">
+                      {m.lastCheck ? `Last try: ${OUTCOME_LABELS[m.lastCheck.outcome] ?? m.lastCheck.outcome}, ${new Date(m.lastCheck.created_at).toLocaleDateString("en-GB")}` : "Hasn't started the check"}
+                    </p>
+                  )}
+                </td>
                 <td className="px-4 py-3 capitalize">
                   {m.level}
                   {m.is_tester && <span className="ml-2 rounded-full bg-garnet px-2 py-0.5 text-[10px] text-white">Tester</span>}

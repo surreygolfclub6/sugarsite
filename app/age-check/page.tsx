@@ -12,17 +12,17 @@ export const metadata: Metadata = { title: "Verify your age" };
 const MESSAGES: Record<string, string> = {
   cancelled: "The check wasn’t completed. You can try again whenever you’re ready.",
   state: "That check didn’t start from this browser. Please start again.",
-  not_verified: "We couldn’t confirm your age. You can try again.",
+  not_verified: "The age check finished without confirming you’re 18 or over. This usually means the check wasn’t completed or the method didn’t pass. Please try again.",
   too_young: "We couldn’t confirm that you’re 18 or over, so we can’t make your profile live.",
-  low_assurance: "That check wasn’t thorough enough. Please try again and choose a stronger method if one is offered.",
+  low_assurance: "The method you used isn’t strong enough for us. Please try again and choose a different method if one is offered.",
   expired: "That check has expired. Please start a new one.",
   used: "That age check has already been used for another account. Contact support if you think this is a mistake.",
   unavailable: "We couldn’t reach the age check service. Please try again in a few minutes.",
 };
 
-async function AgeCheck({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+async function AgeCheck({ searchParams }: { searchParams: Promise<{ error?: string; ref?: string }> }) {
   await connection();
-  const { error } = await searchParams;
+  const { error, ref } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -49,12 +49,15 @@ async function AgeCheck({ searchParams }: { searchParams: Promise<{ error?: stri
       {error && (
         <p role="alert" className="mt-6 rounded-xl border border-line px-4 py-3 text-sm text-danger">
           {MESSAGES[error] ?? MESSAGES.unavailable}
+          {ref && /^[0-9a-f]{8}$/.test(ref) && (
+            <span className="mt-2 block text-xs text-dusk">If it keeps happening, email us and quote reference {ref}.</span>
+          )}
         </p>
       )}
 
       {/* A plain link on purpose: this address starts a check, so the router must never prefetch it. */}
       <a href="/age-check/start" className="btn btn-primary mt-8">
-        Verify my age
+        {error ? "Try again" : "Verify my age"}
       </a>
 
       <ul className="mx-auto mt-8 max-w-xs space-y-2 text-left text-sm text-dusk">
@@ -74,7 +77,7 @@ async function AgeCheck({ searchParams }: { searchParams: Promise<{ error?: stri
   );
 }
 
-export default function AgeCheckPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default function AgeCheckPage({ searchParams }: { searchParams: Promise<{ error?: string; ref?: string }> }) {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-8">
       <p className="display text-2xl">{SITE_NAME}</p>
