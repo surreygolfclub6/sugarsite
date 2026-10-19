@@ -10,6 +10,7 @@ import { MIN_AGE } from "@/lib/config";
 import { ageCheckEnabled } from "@/lib/age-assurance";
 import { approvalRequired } from "@/lib/approval";
 import { notifyAdminsNewMember } from "@/lib/admin-notify";
+import { sendWelcome } from "@/lib/welcome";
 import { ONBOARDING_STEP_FIELDS } from "@/lib/profile-options";
 import { profileInput, profileSchema } from "@/lib/profile-schema";
 
@@ -117,6 +118,7 @@ export async function completeOnboarding(
     .eq("status", "incomplete");
   // With an age check first, the moderators hear about them once they pass it.
   if (!checkAge) after(() => notifyAdminsNewMember(user.id).catch(() => {}));
+  if (next === "active") after(() => sendWelcome(user.id).catch(() => {}));
 
   redirect(checkAge ? "/age-check" : needsApproval ? "/awaiting-approval" : "/discover");
 }

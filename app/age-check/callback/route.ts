@@ -5,6 +5,7 @@ import { exchangeCode, expiryDate, fetchVerification, judge } from "@/lib/age-as
 import { requestOrigin } from "@/lib/origin";
 import { approvalRequired } from "@/lib/approval";
 import { notifyAdminsNewMember } from "@/lib/admin-notify";
+import { sendWelcome } from "@/lib/welcome";
 import { logAgeEvent } from "@/lib/age-events";
 
 // AgeVerif sends the member back here with ?code=&state=. The verdict is fetched server-to-server and only a
@@ -83,5 +84,6 @@ export async function GET(request: NextRequest) {
     .eq("status", "pending_review");
   await logAgeEvent(user.id, "passed", { assurance_level: verification.assurance_level, country: verification.country });
   after(() => notifyAdminsNewMember(user.id).catch(() => {}));
+  if (!needsApproval) after(() => sendWelcome(user.id).catch(() => {}));
   return done(NextResponse.redirect(`${origin}${needsApproval ? "/awaiting-approval" : "/discover"}`));
 }

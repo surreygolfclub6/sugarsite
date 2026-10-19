@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { sendWelcome } from "@/lib/welcome";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
@@ -89,6 +91,7 @@ export async function approveMember(formData: FormData) {
     .eq("user_id", profileId)
     .eq("moderation", "pending");
   await record(admin, user.id, "member_approved", profileId);
+  after(() => sendWelcome(profileId).catch(() => {}));
   revalidatePath("/admin/approvals");
   revalidatePath("/admin");
 }
