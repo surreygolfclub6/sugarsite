@@ -104,7 +104,7 @@ async function Members({ searchParams }: { searchParams: Promise<Params> }) {
         <button className="btn btn-primary">Filter</button>
       </form>
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-line">
+      <div className="relative mt-6 overflow-x-auto rounded-2xl border border-line">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-line text-xs uppercase tracking-wide text-dusk">
             <tr>
