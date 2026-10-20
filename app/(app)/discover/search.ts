@@ -138,6 +138,8 @@ export async function findProfiles(sp: Search, page: number): Promise<{ cards: C
     sort_by: f.sort,
     page_offset: (page - 1) * PAGE_SIZE,
     page_size: PAGE_SIZE + 1,
+    // Only does anything for a moderator; the database ignores it for everyone else.
+    show_everyone: sp.everyone === "1",
   });
   const rows = (data ?? []) as Omit<Card, "photo">[];
   const shown = rows.slice(0, PAGE_SIZE);

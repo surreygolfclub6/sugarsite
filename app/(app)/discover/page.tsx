@@ -32,7 +32,10 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: me } = await supabase.from("profiles").select("status, place_id").eq("id", user.id).single();
+  const [{ data: me }, { data: isAdmin }] = await Promise.all([
+    supabase.from("profiles").select("status, place_id").eq("id", user.id).single(),
+    supabase.rpc("is_admin_user", { uid: user.id }),
+  ]);
   const setup = setupPath(me?.status);
   if (!me || setup) redirect(setup ?? "/onboarding");
   // Recording activity is a write the page doesn't wait on, so it runs after the response is sent.
@@ -77,6 +80,19 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
           </Link>
         ))}
       </nav>
+
+      {isAdmin && (
+        <p className="mt-3 px-1 text-sm text-dusk">
+          {sp.everyone === "1" ? (
+            <>
+              Admin view: showing every member, filters ignored.{" "}
+              <Link href={`/discover?${withParams({ ...sp, everyone: undefined })}`} className="underline">Back to filtered search</Link>
+            </>
+          ) : (
+            <Link href={`/discover?${withParams(sp, { everyone: "1" })}`} className="underline">Admin: show every member</Link>
+          )}
+        </p>
+      )}
 
       <div className="mt-4 space-y-3" aria-live="polite">
         {typeof sp.blocked === "string" && sp.blocked && (
