@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toggleLike } from "../../discover/actions";
 import { MessageButton } from "../../messages/message-button";
@@ -41,12 +42,14 @@ export function LikeFab({ id, name, liked: initial }: { id: string; name: string
   );
 }
 
-export function MessageBar({ profileId, name, own }: { profileId: string; name: string; own: boolean }) {
+export function MessageBar({ profileId, name, own, conversationId }: { profileId: string; name: string; own: boolean; conversationId?: string }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-night/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:static lg:flex-1 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
       <div className="mx-auto max-w-xl lg:max-w-none">
         {own ? (
           <p className="py-3 text-center text-sm text-dusk">This is how your profile looks to others.</p>
+        ) : conversationId ? (
+          <Link href={`/messages/${conversationId}`} className="btn btn-primary w-full">View messages</Link>
         ) : (
           <MessageButton profileId={profileId} name={name} variant="bar" />
         )}

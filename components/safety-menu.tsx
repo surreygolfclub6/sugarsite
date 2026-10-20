@@ -123,7 +123,7 @@ export function SafetyMenu({ profileId, name, conversationId, privateSharing }: 
   );
 }
 
-function ShareDialog({ dialogRef, meId, otherId, name, onShared }: { dialogRef: React.RefObject<HTMLDialogElement | null>; meId: string; otherId: string; name: string; onShared: () => void }) {
+export function ShareDialog({ dialogRef, meId, otherId, name, onShared }: { dialogRef: React.RefObject<HTMLDialogElement | null>; meId: string; otherId: string; name: string; onShared: () => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   async function share() {

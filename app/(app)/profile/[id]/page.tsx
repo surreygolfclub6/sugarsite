@@ -22,6 +22,7 @@ import { LevelBadge } from "@/components/level-badge";
 import type { TierKey } from "@/lib/levels";
 import { Gallery, type GalleryPhoto } from "./gallery";
 import { SafetyMenu } from "@/components/safety-menu";
+import { PrivateShareLink } from "@/components/private-share-link";
 import { LikeFab, MessageBar } from "./profile-actions";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -97,6 +98,22 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
 
   const name = p.display_name ?? "Member";
   const own = p.id === user.id;
+
+  // Whether you already have messages with this member (the Message button then opens them), and whether you can share your
+  // private photos with them (you must have a conversation or a match, which the database also enforces).
+  let messagesId: string | undefined;
+  let share: { canShare: boolean; shared: boolean } = { canShare: false, shared: false };
+  if (!own) {
+    const [a, b] = [user.id, id].sort();
+    const [{ data: convs }, { data: pair }, { count: myPrivate }, { data: shareRow }] = await Promise.all([
+      supabase.rpc("my_conversations"),
+      supabase.from("conversations").select("id").eq("user_a", a).eq("user_b", b).maybeSingle(),
+      supabase.from("photos").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("visibility", "private"),
+      supabase.from("photo_shares").select("viewer_id").eq("owner_id", user.id).eq("viewer_id", id).maybeSingle(),
+    ]);
+    messagesId = ((convs ?? []) as { id: string; other_id: string }[]).find((c) => c.other_id === id)?.id;
+    share = { canShare: (myPrivate ?? 0) > 0 && (Boolean(pair) || Boolean(iLiked && theyLiked)), shared: Boolean(shareRow) };
+  }
   const seeking = (p.seeking as string[]).map((v) => labelOf(SEEKING, v)).filter(Boolean).join(", ");
   const details: [string, string | null][] = [
     ["I am", labelOf(GENDERS, p.gender)],
@@ -127,8 +144,9 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
       {/* Fixed to the bottom of the screen on phones; an ordinary row under the name on wide screens. */}
       <div className="lg:flex lg:items-center lg:gap-3 lg:px-1">
         {!own && <LikeFab id={p.id} name={name} liked={Boolean(iLiked)} />}
-        <MessageBar profileId={p.id} name={name} own={own} />
+        <MessageBar profileId={p.id} name={name} own={own} conversationId={messagesId} />
       </div>
+      {!own && (share.canShare || share.shared) && <PrivateShareLink meId={user.id} otherId={p.id} name={name} shared={share.shared} />}
 
       <section aria-label="At a glance" className={`${card} grid grid-cols-2 divide-line [&>*:nth-child(odd)]:border-r [&>*:nth-child(odd)]:border-line`}>
         <Fact icon={<Icon d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />}>
@@ -144,8 +162,8 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
 
       <section aria-labelledby="about" className={card}>
         <h2 id="about" className="display text-2xl">About</h2>
-        {p.headline && <p className="mt-3 text-lg font-medium">{p.headline}</p>}
-        <p className="mt-2 whitespace-pre-line">{p.bio}</p>
+        {p.headline && <p className="mt-3 text-lg font-medium break-words">{p.headline}</p>}
+        <p className="mt-2 whitespace-pre-line break-words">{p.bio}</p>
       </section>
 
       <section aria-labelledby="wants" className={card}>
@@ -153,7 +171,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
           <h2 id="wants" className="display text-2xl">I’m looking for</h2>
           <span className="text-sm text-dusk">{seeking}</span>
         </div>
-        {p.looking_for && <p className="mt-3 whitespace-pre-line">{p.looking_for}</p>}
+        {p.looking_for && <p className="mt-3 whitespace-pre-line break-words">{p.looking_for}</p>}
         <ul className="mt-4 flex flex-wrap gap-2" aria-label="Relationship goals">
           {(p.relationship_goals as string[]).map((g) => (
             <li key={g} className="rounded-xl border border-line px-3 py-1.5 text-sm">{labelOf(RELATIONSHIP_GOALS, g)}</li>
