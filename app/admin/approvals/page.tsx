@@ -43,8 +43,8 @@ async function Approvals() {
   const urlFor = (path: string) => signed?.find((s) => s.path === path)?.signedUrl ?? undefined;
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8">
-      <Link href="/discover" className="display text-2xl">{SITE_NAME}</Link>
+    <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8 lg:max-w-6xl">
+      <Link href="/discover" className="display text-2xl lg:hidden">{SITE_NAME}</Link>
       <Suspense fallback={null}>
         <AdminNav current="approvals" />
       </Suspense>
@@ -61,6 +61,8 @@ async function Approvals() {
           const mine = (photos ?? []).filter((p) => p.user_id === m.id);
           return (
             <li key={m.id} data-member={m.id} className="rounded-2xl border border-line p-5">
+              <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-x-8">
+                <div>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="display text-2xl">{m.display_name}{m.birthdate && `, ${ageFrom(m.birthdate)}`}</h2>
                 <p className="text-xs text-dusk">Joined {new Date(m.created_at).toLocaleDateString("en-GB")}</p>
@@ -77,17 +79,6 @@ async function Approvals() {
               {m.looking_for && <p className="mt-2 whitespace-pre-line text-sm text-dusk">{m.looking_for}</p>}
               {(m.relationship_goals ?? []).length > 0 && <p className="mt-2 text-sm text-dusk">Looking for: {m.relationship_goals.join(", ")}</p>}
 
-              <ul className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                {mine.map((p) => (
-                  <li key={p.id} className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={urlFor(p.storage_path)} alt={`${m.display_name}’s ${p.visibility} photo (${p.moderation})`} className="aspect-[3/4] w-full rounded-xl border border-line object-cover" />
-                    <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">{p.visibility === "private" ? "Private" : "Public"}</span>
-                  </li>
-                ))}
-                {mine.length === 0 && <li className="text-sm text-dusk">No photos.</li>}
-              </ul>
-
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <form action={approveMember}>
                   <input type="hidden" name="profile_id" value={m.id} />
@@ -102,6 +93,18 @@ async function Approvals() {
                   </select>
                   <button className="btn btn-quiet text-danger">Decline</button>
                 </form>
+              </div>
+                </div>
+              <ul className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:mt-0 lg:grid-cols-2">
+                {mine.map((p) => (
+                  <li key={p.id} className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={urlFor(p.storage_path)} alt={`${m.display_name}’s ${p.visibility} photo (${p.moderation})`} className="aspect-[3/4] w-full rounded-xl border border-line object-cover" />
+                    <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">{p.visibility === "private" ? "Private" : "Public"}</span>
+                  </li>
+                ))}
+                {mine.length === 0 && <li className="text-sm text-dusk">No photos.</li>}
+              </ul>
               </div>
             </li>
           );

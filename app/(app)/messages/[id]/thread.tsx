@@ -192,10 +192,10 @@ export function Thread({
   const lastMine = [...messages].reverse().find((m) => m.sender_id === meId);
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-night">
+    <div className="fixed inset-0 z-40 flex flex-col bg-night lg:static lg:inset-auto lg:z-auto lg:h-full">
       <header className="border-b border-line">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-3 py-2.5">
-          <Link href="/messages" aria-label="Back to messages" className="grid size-10 place-items-center rounded-full hover:bg-velvet">
+          <Link href="/messages" aria-label="Back to messages" className="grid size-10 place-items-center rounded-full hover:bg-velvet lg:hidden">
             <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M19 12H5m6-7-7 7 7 7" />
             </svg>

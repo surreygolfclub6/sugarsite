@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
@@ -95,6 +96,8 @@ export async function deleteConversation(conversationId: string): Promise<{ erro
   if (!id.success) return { error: "We couldn’t delete that conversation." };
   const { error } = await supabase.rpc("clear_conversation", { conv: id.data });
   if (error) return { error: "We couldn’t delete that conversation. Please try again." };
+  // The conversation list lives in the messages layout, which isn't re-fetched by a plain navigation.
+  revalidatePath("/messages", "layout");
   redirect(`/messages?deleted=${Date.now()}`);
 }
 

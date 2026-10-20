@@ -106,7 +106,8 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
   ];
 
   return (
-    <article className="space-y-3 pb-20">
+    <article className="space-y-3 pb-20 lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-x-8 lg:space-y-0 lg:pb-0">
+      <div className="space-y-3 lg:sticky lg:top-20">
       <Gallery name={name} photos={galleryPhotos} locked={lockedPhotos} ownerView={own} menu={own ? undefined : <SafetyMenu profileId={p.id} name={name} />} />
       {lockedPhotos > 0 && (
         <p className="flex items-start gap-2 px-1 text-sm text-dusk">
@@ -116,9 +117,17 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
           <span>{name} has {lockedPhotos} private {lockedPhotos === 1 ? "photo" : "photos"}. Members choose who to share them with, usually once they’ve been in touch.</span>
         </p>
       )}
+      </div>
 
-      <div className="px-1 pt-2">
+      <div className="space-y-3">
+      <div className="px-1 pt-2 lg:pt-0">
         <h1 className="display text-4xl">{name}{age !== undefined && `, ${age}`}{p.age_verified && <> <AgeBadge className="inline size-6 align-middle" /></>}</h1>
+      </div>
+
+      {/* Fixed to the bottom of the screen on phones; an ordinary row under the name on wide screens. */}
+      <div className="lg:flex lg:items-center lg:gap-3 lg:px-1">
+        {!own && <LikeFab id={p.id} name={name} liked={Boolean(iLiked)} />}
+        <MessageBar profileId={p.id} name={name} own={own} />
       </div>
 
       <section aria-label="At a glance" className={`${card} grid grid-cols-2 divide-line [&>*:nth-child(odd)]:border-r [&>*:nth-child(odd)]:border-line`}>
@@ -202,8 +211,7 @@ async function Profile({ params }: { params: Promise<{ id: string }> }) {
         </section>
       )}
 
-      {!own && <LikeFab id={p.id} name={name} liked={Boolean(iLiked)} />}
-      <MessageBar profileId={p.id} name={name} own={own} />
+      </div>
     </article>
   );
 }

@@ -104,8 +104,8 @@ async function Results({ searchParams }: { searchParams: Promise<Search> }) {
       </div>
 
       {me.status === "active" && !me.place_id && (
-        <form action={setMyLocation} className="mt-4 space-y-3 rounded-xl border border-line p-4" aria-label="Set your location">
-          <p className="text-sm text-dusk">Add your location to see distances and search near you.</p>
+        <form action={setMyLocation} className="mt-4 space-y-3 rounded-xl border border-line p-4 lg:grid lg:grid-cols-[1fr_auto] lg:items-end lg:gap-x-4 lg:space-y-0" aria-label="Set your location">
+          <p className="text-sm text-dusk lg:col-span-2 lg:mb-3">Add your location to see distances and search near you.</p>
           <PlacePicker name="place_id" label="Your location" />
           <button className="btn btn-primary !py-2">Save location</button>
         </form>

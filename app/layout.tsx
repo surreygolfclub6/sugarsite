@@ -28,6 +28,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         {/* Applies the saved theme before first paint. Light is the default. */}
+        {/* Blocking on purpose: it must run before first paint so the page never flashes the wrong theme. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/theme.js" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </head>

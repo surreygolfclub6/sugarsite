@@ -24,12 +24,12 @@ async function More() {
   return (
     <>
       <h1 className="display px-1 text-4xl">More</h1>
-      <div className="mt-6">
+      <div className="mt-6 lg:mb-3">
         <Suspense fallback={null}>
           <LevelCard userId={user.id} />
         </Suspense>
       </div>
-      <ul className="space-y-3">
+      <ul className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
         <li><Link href="/more/levels" className={link}>Levels and invites</Link></li>
         <li><Link href="/more/profile" className={link}>Edit profile</Link></li>
         <li><Link href="/photos" className={link}>Your photos</Link></li>

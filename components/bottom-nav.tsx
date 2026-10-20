@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { createClient, realtimeReady } from "@/lib/supabase/client";
 
 const icon = "size-6";
-const items = [
+export const navItems = [
   {
     href: "/discover",
     label: "Search",
@@ -51,7 +51,7 @@ const items = [
 ];
 
 // Unread messages across all conversations, kept current over Realtime.
-function useUnread(path: string) {
+export function useUnread(path: string) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     let alive = true;
@@ -88,9 +88,9 @@ export function BottomNav() {
   // A profile page and an open conversation have their own bottom bars, so the tabs step aside.
   if (path.startsWith("/profile/") || /^\/messages\/[^/]+/.test(path)) return null;
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-night/95 backdrop-blur">
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-night/95 backdrop-blur lg:hidden">
       <ul className="mx-auto flex max-w-5xl justify-around px-2 pb-[env(safe-area-inset-bottom)]">
-        {items.map((item) => {
+        {navItems.map((item) => {
           const active = item.match.some((m) => path === m || path.startsWith(`${m}/`));
           const style = `flex flex-col items-center gap-0.5 px-4 py-2.5 text-xs ${active ? "text-pearl" : "text-dusk"}`;
           return (

@@ -111,7 +111,7 @@ async function SearchContent({ searchParams }: { searchParams: Promise<Search> }
           <DualRangeField nameMin="height_min" nameMax="height_max" label="Height" minLabel="Minimum height" maxLabel="Maximum height" kind="height" min={MIN_HEIGHT_CM} max={MAX_HEIGHT_CM} step={1} defaultMin={f.heightMin} defaultMax={f.heightMax} />
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <MultiSelect name="goal" label="They’re looking for" options={RELATIONSHIP_GOALS} defaultValues={all(f.goals, RELATIONSHIP_GOALS)} />
           <MultiSelect name="status" label="Relationship status" options={RELATIONSHIP_STATUSES} defaultValues={all(f.status, RELATIONSHIP_STATUSES)} />
           <MultiSelect name="body" label="Body type" options={BODY_TYPES} defaultValues={all(f.body, BODY_TYPES)} />

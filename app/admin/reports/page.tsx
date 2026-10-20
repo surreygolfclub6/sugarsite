@@ -57,8 +57,8 @@ async function Reports() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8">
-      <Link href="/discover" className="display text-2xl">{SITE_NAME}</Link>
+    <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8 lg:max-w-6xl">
+      <Link href="/discover" className="display text-2xl lg:hidden">{SITE_NAME}</Link>
       <Suspense fallback={null}>
         <AdminNav current="reports" />
       </Suspense>
@@ -85,6 +85,7 @@ async function Reports() {
               </div>
               {r.details && <p className="mt-3 whitespace-pre-line rounded-xl bg-velvet px-4 py-3">{r.details}</p>}
 
+              <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
               <section aria-label="Reported member" className="mt-5">
                 <p className="font-medium">
                   {who?.display_name ?? "Unknown"}
@@ -120,6 +121,7 @@ async function Reports() {
                   </ul>
                 </section>
               )}
+              </div>
 
               <form action={resolveReport} className="mt-6 flex flex-wrap gap-3">
                 <input type="hidden" name="report_id" value={r.id} />

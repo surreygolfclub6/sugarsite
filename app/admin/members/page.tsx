@@ -75,7 +75,7 @@ async function Members({ searchParams }: { searchParams: Promise<Params> }) {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8">
-      <Link href="/discover" className="display text-2xl">{SITE_NAME}</Link>
+      <Link href="/discover" className="display text-2xl lg:hidden">{SITE_NAME}</Link>
       <Suspense fallback={null}>
         <AdminNav current="members" />
       </Suspense>

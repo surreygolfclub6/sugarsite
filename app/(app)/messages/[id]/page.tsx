@@ -93,7 +93,7 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
 
 export default function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <Suspense fallback={<div className="fixed inset-0 z-40 bg-night" aria-busy="true" />}>
+    <Suspense fallback={<div className="fixed inset-0 z-40 bg-night lg:static lg:z-auto lg:h-full" aria-busy="true" />}>
       <Conversation params={params} />
     </Suspense>
   );

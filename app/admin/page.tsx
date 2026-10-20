@@ -50,7 +50,7 @@ async function Queue() {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8">
-      <p className="display text-2xl">{SITE_NAME}</p>
+      <p className="display text-2xl lg:hidden">{SITE_NAME}</p>
       <Suspense fallback={null}>
         <AdminNav current="photos" />
       </Suspense>

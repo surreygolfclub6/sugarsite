@@ -21,7 +21,7 @@ async function Mfa() {
   if (mode === "manage") {
     return (
       <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8">
-        <Link href="/discover" className="display text-2xl">{SITE_NAME}</Link>
+        <Link href="/discover" className="display text-2xl lg:hidden">{SITE_NAME}</Link>
         <Suspense fallback={null}>
           <AdminNav current="security" />
         </Suspense>
