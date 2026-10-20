@@ -40,6 +40,7 @@ export function Thread({
   sharing,
   myPhotos,
   likes: initialLikes,
+  shares: initialShares,
   initial,
   hasEarlier: initialHasEarlier,
 }: {
@@ -49,6 +50,7 @@ export function Thread({
   sharing: { canShare: boolean; shared: boolean };
   myPhotos: MyPhoto[];
   likes: Likes;
+  shares: Likes;
   initial: Message[];
   hasEarlier: boolean;
 }) {
@@ -58,6 +60,8 @@ export function Thread({
   const [text, setText] = useState("");
   const [error, setError] = useState<string>();
   const [likes, setLikes] = useState<Likes>(initialLikes);
+  // When each of you shared private photos with the other (null if not currently shared).
+  const [shares, setShares] = useState<Likes>(initialShares);
   const [picking, setPicking] = useState(false);
   const [attached, setAttached] = useState<MyPhoto>();
   const scroller = useRef<HTMLDivElement>(null);
@@ -111,6 +115,10 @@ export function Thread({
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "likes", filter: `to_user=eq.${meId}` }, (payload) => {
           const like = payload.new as { from_user: string; created_at: string };
           if (like.from_user === other.id) setLikes((cur) => ({ ...cur, theirs: like.created_at }));
+        })
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "photo_shares", filter: `viewer_id=eq.${meId}` }, (payload) => {
+          const share = payload.new as { owner_id: string; created_at: string };
+          if (share.owner_id === other.id) setShares((cur) => ({ ...cur, theirs: share.created_at }));
         })
         .subscribe(async (status) => {
           if (status !== "SUBSCRIBED") {
@@ -186,8 +194,10 @@ export function Thread({
     if (likes.mine) items.push({ kind: "event", at: Date.parse(likes.mine), id: "like-mine", text: `You liked ${other.name}` });
     if (likes.theirs) items.push({ kind: "event", at: Date.parse(likes.theirs), id: "like-theirs", text: `${other.name} liked you` });
     if (likes.mine && likes.theirs) items.push({ kind: "event", at: Math.max(Date.parse(likes.mine), Date.parse(likes.theirs)) + 1, id: "match", text: `It’s a match! You and ${other.name} liked each other.` });
+    if (shares.theirs) items.push({ kind: "event", at: Date.parse(shares.theirs), id: "share-theirs", text: `${other.name} shared their private photos with you` });
+    if (shares.mine) items.push({ kind: "event", at: Date.parse(shares.mine), id: "share-mine", text: `You shared your private photos with ${other.name}` });
     return items.sort((a, b) => a.at - b.at);
-  }, [messages, likes, other.name]);
+  }, [messages, likes, shares, other.name]);
 
   const lastMine = [...messages].reverse().find((m) => m.sender_id === meId);
 
@@ -215,7 +225,7 @@ export function Thread({
             </span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
-            <SafetyMenu profileId={other.id} name={other.name} conversationId={conversationId} privateSharing={{ meId, canShare: sharing.canShare, shared: sharing.shared }} />
+            <SafetyMenu profileId={other.id} name={other.name} conversationId={conversationId} privateSharing={{ meId, canShare: sharing.canShare, shared: sharing.shared }} onShareChange={(on) => setShares((cur) => ({ ...cur, mine: on ? new Date().toISOString() : null }))} />
           </div>
         </div>
       </header>

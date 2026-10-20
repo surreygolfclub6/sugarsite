@@ -60,6 +60,16 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
     theirs: likeRows?.find((l) => l.from_user === otherId)?.created_at ?? null,
   };
 
+  // When either of you shared private photos with the other, so it appears in the conversation.
+  const { data: shareRows } = await supabase
+    .from("photo_shares")
+    .select("owner_id, created_at")
+    .or(`and(owner_id.eq.${user.id},viewer_id.eq.${otherId}),and(owner_id.eq.${otherId},viewer_id.eq.${user.id})`);
+  const shares = {
+    mine: shareRows?.find((s) => s.owner_id === user.id)?.created_at ?? null,
+    theirs: shareRows?.find((s) => s.owner_id === otherId)?.created_at ?? null,
+  };
+
   const initial = await withPhotoUrls(supabase, rows.slice(0, PAGE).reverse());
 
   // Your own approved photos, to pick from when you want to send one.
@@ -85,6 +95,7 @@ async function Conversation({ params }: { params: Promise<{ id: string }> }) {
       other={{ id: other.id, name: other.display_name ?? "Member", photo, online: isOnline(other.last_active_at), verified: other.age_verified }}
       myPhotos={myPhotos}
       likes={likes}
+      shares={shares}
       initial={initial}
       hasEarlier={rows.length > PAGE}
     />

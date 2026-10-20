@@ -21,6 +21,11 @@ export function RefreshOnMessage() {
           clearTimeout(timer);
           timer = setTimeout(() => router.refresh(), 250);
         })
+        // Someone sharing private photos with you adds a conversation (or a line in one), so the list refreshes then too.
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "photo_shares" }, () => {
+          clearTimeout(timer);
+          timer = setTimeout(() => router.refresh(), 250);
+        })
         .subscribe();
     });
     return () => {

@@ -13,13 +13,15 @@ type Props = {
   name: string;
   conversationId?: string;
   privateSharing?: { meId: string; canShare: boolean; shared: boolean };
+  // Lets the page showing the menu (a conversation) keep its own record of sharing in step.
+  onShareChange?: (shared: boolean) => void;
 };
 
 const dialogStyle =
   "m-auto w-[min(92vw,28rem)] rounded-2xl border border-line bg-velvet p-5 text-pearl backdrop:bg-black/70";
 
 // The "..." menu on a profile or conversation: report or block that member.
-export function SafetyMenu({ profileId, name, conversationId, privateSharing }: Props) {
+export function SafetyMenu({ profileId, name, conversationId, privateSharing, onShareChange }: Props) {
   const [open, setOpen] = useState(false);
   const [shared, setShared] = useState(privateSharing?.shared ?? false);
   const [sharing, setSharing] = useState<string>();
@@ -34,7 +36,10 @@ export function SafetyMenu({ profileId, name, conversationId, privateSharing }: 
     if (!privateSharing) return;
     setOpen(false);
     const { error } = await createClient().from("photo_shares").delete().eq("owner_id", privateSharing.meId).eq("viewer_id", profileId);
-    if (!error) setShared(false);
+    if (!error) {
+      setShared(false);
+      onShareChange?.(false);
+    }
     setSharing(error ? "We couldn’t stop sharing. Please try again." : `You’ve stopped sharing your private photos with ${name}.`);
     setTimeout(() => setSharing(undefined), 4000);
   }
@@ -111,6 +116,7 @@ export function SafetyMenu({ profileId, name, conversationId, privateSharing }: 
           name={name}
           onShared={() => {
             setShared(true);
+            onShareChange?.(true);
             setSharing(`${name} can now see your private photos.`);
             setTimeout(() => setSharing(undefined), 4000);
           }}
@@ -132,6 +138,8 @@ export function ShareDialog({ dialogRef, meId, otherId, name, onShared }: { dial
     const { error: failed } = await createClient().from("photo_shares").insert({ owner_id: meId, viewer_id: otherId });
     setBusy(false);
     if (failed && failed.code !== "23505") return setError("We couldn’t share. Please try again.");
+    // Makes sure there is a conversation for it to appear in (a match may not have one yet). Not needed for the share itself.
+    await createClient().rpc("start_conversation", { other: otherId });
     dialogRef.current?.close();
     onShared();
   }
